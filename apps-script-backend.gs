@@ -29,7 +29,7 @@
 const RECIPIENTS = "imamericanyess@gmail.com,kumarabhinav7349@gmail.com";
 
 // Paste your Google Sheet ID here (required for both settings + logging).
-const SHEET_ID = "PASTE_YOUR_GOOGLE_SHEET_ID_HERE";
+const SHEET_ID = "11joNjVKYi4CrnNOBHYMX_aIer4eiKnzpg0VaWfm2WdQ";
 
 const DRIVE_FOLDER_NAME = "BGMI Scrim Payment Screenshots";
 
@@ -46,7 +46,11 @@ const DEFAULT_SETTINGS = [
   ["upiId", "princeraj21@fam"],
   ["upiPayeeName", "PRINCE"],
   ["roomId", ""],
-  ["roomTime", ""]
+  ["roomTime", ""],
+  ["activeMap", "erangel"],
+  ["erangelMax", "100"],
+  ["livikMax", "50"],
+  ["miramarMax", "100"]
 ];
 
 /* ================== doGet: serves live settings ================== */
@@ -55,29 +59,79 @@ const DEFAULT_SETTINGS = [
 // broadcastRoomId() below, never through this public endpoint.
 const PUBLIC_SETTINGS_KEYS = [
   "mode", "schedule", "winPrize", "mvpPrize",
-  "liveStream", "whatsappGroup", "entryFee", "upiId", "upiPayeeName"
+  "liveStream", "whatsappGroup", "entryFee", "upiId", "upiPayeeName",
+  "activeMap"
 ];
+
+// Maps each map name to its "max players" Settings key.
+const MAP_MAX_KEYS = { erangel: "erangelMax", livik: "livikMax", miramar: "miramarMax" };
 
 function doGet(e) {
   try {
     const sheet = getOrCreateSettingsSheet();
     const rows = sheet.getDataRange().getValues();
     const settings = {};
+    const rawSettings = {};
     for (let i = 1; i < rows.length; i++) {
       const key = rows[i][0];
       const value = rows[i][1];
+      if (key) rawSettings[key] = value;
       if (key && PUBLIC_SETTINGS_KEYS.indexOf(key) !== -1) settings[key] = value;
     }
+
+    // Capacity for the currently active map — computed fresh every load,
+    // never trusted from the client. Counts squads registered for the
+    // map currently set in "activeMap", x4 players per squad.
+    const activeMap = String(rawSettings.activeMap || "erangel").toLowerCase();
+    const maxKey = MAP_MAX_KEYS[activeMap] || "erangelMax";
+    const mapMax = Number(rawSettings[maxKey] || 100);
+    const playersRegistered = countTeamsForMap(activeMap) * 4;
+
+    settings.activeMap = activeMap;
+    settings.mapMax = mapMax;
+    settings.playersRegistered = playersRegistered;
+    settings.mapFull = playersRegistered >= mapMax;
+
     return jsonResponse({ status: "success", settings: settings });
   } catch (err) {
     return jsonResponse({ status: "error", message: err.message });
   }
 }
 
-/* ================== doPost: form submissions ================== */
+function countTeamsForMap(map) {
+  const regSheet = getOrCreateRegistrationsSheet();
+  const rows = regSheet.getDataRange().getValues();
+  let count = 0;
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][16] || "").toLowerCase() === map) count++; // column 17 = Map
+  }
+  return count;
+}
+
+/* ================== doPost: form submissions + payment notifications ================== */
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+
+    if (data.type === "payment_notification") {
+      return handlePaymentNotification(data);
+    }
+
+    // Read the live settings ourselves — never trust a map/cap value from
+    // the client — and reject if this map's lobby is already full.
+    const settingsSheet = getOrCreateSettingsSheet();
+    const settingsRows = settingsSheet.getDataRange().getValues();
+    const rawSettings = {};
+    for (let i = 1; i < settingsRows.length; i++) {
+      if (settingsRows[i][0]) rawSettings[settingsRows[i][0]] = settingsRows[i][1];
+    }
+    const activeMap = String(rawSettings.activeMap || "erangel").toLowerCase();
+    const maxKey = MAP_MAX_KEYS[activeMap] || "erangelMax";
+    const mapMax = Number(rawSettings[maxKey] || 100);
+
+    if (countTeamsForMap(activeMap) * 4 >= mapMax) {
+      return jsonResponse({ status: "full", message: "This map's lobby is full." });
+    }
 
     let screenshotUrl = "Not provided";
     if (data.screenshotBase64) {
@@ -90,7 +144,7 @@ function doPost(e) {
       body: buildEmailBody(data, screenshotUrl)
     });
 
-    logToSheet(data, screenshotUrl);
+    logToSheet(data, screenshotUrl, activeMap);
 
     return jsonResponse({ status: "success" });
   } catch (err) {
@@ -127,7 +181,7 @@ function buildEmailBody(data, screenshotUrl) {
   return lines.join("\n");
 }
 
-function logToSheet(data, screenshotUrl) {
+function logToSheet(data, screenshotUrl, map) {
   const sheet = getOrCreateRegistrationsSheet();
   sheet.appendRow([
     new Date(),
@@ -137,7 +191,8 @@ function logToSheet(data, screenshotUrl) {
     data.p3name, data.p3uid,
     data.p4name, data.p4uid,
     data.txnRef, screenshotUrl,
-    "Pending" // payment verification status — update manually
+    "Pending", // payment verification status — update manually
+    map || ""
   ]);
 }
 
@@ -150,8 +205,11 @@ function getOrCreateRegistrationsSheet() {
     sheet.appendRow([
       "Timestamp", "Team", "Captain Name", "Captain Email", "WhatsApp",
       "P1 Name", "P1 UID", "P2 Name", "P2 UID", "P3 Name", "P3 UID",
-      "P4 Name", "P4 UID", "Txn Ref", "Screenshot", "Status"
+      "P4 Name", "P4 UID", "Txn Ref", "Screenshot", "Status", "Map"
     ]);
+  } else if (sheet.getLastColumn() < 17) {
+    // Migration: sheet was created before the Map column existed.
+    sheet.getRange(1, 17).setValue("Map");
   }
   return sheet;
 }
@@ -179,6 +237,96 @@ function setupSettingsSheet() {
 function getOrCreateFolder(name) {
   const folders = DriveApp.getFoldersByName(name);
   return folders.hasNext() ? folders.next() : DriveApp.createFolder(name);
+}
+
+/* ====================================================================
+   PAYMENT NOTIFICATION HANDLER (the FamPay notification hack)
+   ----------------------------------------------------------------
+   MacroDroid POSTs here whenever a FamPay notification fires, with:
+   { "type": "payment_notification", "title": "...", "text": "..." }
+
+   Matching strategy, most to least reliable:
+   1. If the notification text contains our SCRIM ref code (rare —
+      most UPI apps don't surface the note/remark in the notification
+      itself, but if FamPay does, this is a 100% reliable match).
+   2. Otherwise, match by amount among "Pending" rows submitted in the
+      last 15 minutes. Only auto-approves if EXACTLY ONE candidate
+      matches — if it's ambiguous (two teams paid ₹20 minutes apart),
+      it emails you instead of guessing wrong.
+
+   Honesty note for you: this is a best-effort hack reading your own
+   phone's notifications, not an official bank/UPI integration. It can
+   miss or misfire if FamPay changes its notification wording — keep
+   an eye on the Registrations tab early on to make sure it's matching
+   correctly before fully trusting it.
+   ==================================================================== */
+function handlePaymentNotification(data) {
+  const rawText = ((data.text || "") + " " + (data.title || "")).trim();
+  const amountMatch = rawText.match(/(?:₹|rs\.?|inr)\s?([0-9]+(?:\.[0-9]{1,2})?)/i);
+  const refMatch = rawText.match(/SCRIM[A-Z0-9]{6}/i);
+  const amount = amountMatch ? amountMatch[1] : null;
+  const ref = refMatch ? refMatch[0].toUpperCase() : null;
+
+  const sheet = getOrCreateRegistrationsSheet();
+  const rows = sheet.getDataRange().getValues();
+
+  // 1. Exact ref match (column 14, index 13 = "Txn Ref")
+  if (ref) {
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][13]).toUpperCase() === ref) {
+        approveRow(sheet, i + 1, rows[i]);
+        return jsonResponse({ status: "success", matched: "ref" });
+      }
+    }
+  }
+
+  // 2. Amount + recency match, only if unambiguous
+  if (amount) {
+    const now = new Date();
+    const candidates = [];
+    for (let i = 1; i < rows.length; i++) {
+      const status = String(rows[i][15]).trim().toLowerCase(); // column 16 = Status
+      const timestamp = new Date(rows[i][0]);
+      const minutesAgo = (now - timestamp) / 60000;
+      if (status === "pending" && minutesAgo >= 0 && minutesAgo <= 15) {
+        candidates.push(i);
+      }
+    }
+    if (candidates.length === 1) {
+      const i = candidates[0];
+      approveRow(sheet, i + 1, rows[i]);
+      return jsonResponse({ status: "success", matched: "amount-unique" });
+    } else if (candidates.length > 1) {
+      MailApp.sendEmail({
+        to: RECIPIENTS,
+        subject: "⚠ Payment notification — too many possible matches",
+        body: "Got a FamPay notification for ₹" + amount + " but found " + candidates.length +
+              " pending entries in the last 15 minutes — too ambiguous to auto-approve safely.\n\n" +
+              "Raw notification: " + rawText + "\n\nPlease check and approve manually in the Registrations tab."
+      });
+      return jsonResponse({ status: "ambiguous", candidates: candidates.length });
+    }
+  }
+
+  // No amount detected at all — probably an unrelated FamPay notification (offer, promo, etc).
+  return jsonResponse({ status: "ignored" });
+}
+
+function approveRow(sheet, rowNumber, rowData) {
+  sheet.getRange(rowNumber, 16).setValue("Approved"); // Status column
+  // Script-driven edits don't fire the onEdit trigger, so send the
+  // confirmation email directly here instead of relying on onStatusChange.
+  const teamName = rowData[1];
+  const captainEmail = rowData[3];
+  if (captainEmail) {
+    MailApp.sendEmail({
+      to: captainEmail,
+      subject: "✅ Squad Confirmed — " + teamName,
+      body: "Your squad \"" + teamName + "\" is confirmed for the scrim!\n\n" +
+            "Room ID and lobby time will be posted in the WhatsApp group shortly before the match — keep notifications on.\n\n" +
+            "See you in the lobby.\n— VIRGO YT 707"
+    });
+  }
 }
 
 function jsonResponse(obj) {
