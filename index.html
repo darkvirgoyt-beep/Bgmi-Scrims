@@ -110,6 +110,17 @@
   .briefing .cell .k{font-size:10px; color:var(--text-dim); letter-spacing:0.15em; text-transform:uppercase; font-family:'JetBrains Mono',monospace;}
   .briefing .cell .v{font-size:16px; font-weight:700; color:var(--gold); margin-top:4px; font-family:'Rajdhani',sans-serif;}
 
+  /* ===== map capacity banner ===== */
+  #capacityPanel{padding:18px 22px;}
+  .capacity-row{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .capacity-map{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:18px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text);}
+  .capacity-count{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);}
+  .capacity-count span{color:var(--gold); font-weight:600;}
+  .capacity-bar{height:8px; border-radius:999px; background:var(--panel-2); margin-top:12px; overflow:hidden;}
+  .capacity-bar-fill{height:100%; width:0%; background:var(--gold); border-radius:999px; transition:width .4s ease, background .3s ease;}
+  .capacity-full-note{display:none; margin-top:12px; font-size:13px; color:var(--crimson); font-weight:600;}
+  #capacityPanel.full .capacity-full-note{display:block;}
+
   /* ===== section shell ===== */
   section.step{padding:0 20px 40px;}
   .step-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
@@ -284,6 +295,17 @@
 </div>
 
 <section class="step wrap">
+  <div class="panel" id="capacityPanel">
+    <div class="capacity-row">
+      <div class="capacity-map">🗺️ <span id="capacityMapName">—</span></div>
+      <div class="capacity-count"><span id="capacityCount">0</span> / <span id="capacityMax">0</span> players</div>
+    </div>
+    <div class="capacity-bar"><div class="capacity-bar-fill" id="capacityBarFill"></div></div>
+    <div class="capacity-full-note" id="capacityFullNote">🔒 This map is FULL — registration is closed. Watch the WhatsApp group for the next round.</div>
+  </div>
+</section>
+
+<section class="step wrap" id="step1Section">
   <div class="step-head"><span class="step-num">01</span><h2>Sign In</h2></div>
   <div class="step-sub">Used to identify your squad's captain. We don't post this anywhere.</div>
   <div class="panel">
@@ -299,6 +321,7 @@
 </section>
 
 <div id="registerArea">
+
 
   <section class="step wrap">
     <div class="step-head"><span class="step-num">02</span><h2>Squad Roster</h2></div>
@@ -476,6 +499,32 @@ async function loadLiveSettings() {
     document.getElementById('upiIdText').textContent = CONFIG.UPI_ID;
     document.getElementById('amountText').textContent = '₹' + CONFIG.ENTRY_FEE;
 
+    // Map capacity — set by editing "activeMap" in the Settings sheet.
+    // Locks registration automatically once the cap for that map is hit.
+    const mapName = (s.activeMap || 'erangel').toUpperCase();
+    const mapMax = Number(s.mapMax || 0);
+    const registered = Number(s.playersRegistered || 0);
+    const isFull = !!s.mapFull;
+
+    document.getElementById('capacityMapName').textContent = mapName;
+    document.getElementById('capacityCount').textContent = registered;
+    document.getElementById('capacityMax').textContent = mapMax;
+    const pct = mapMax > 0 ? Math.min(100, (registered / mapMax) * 100) : 0;
+    const fillEl = document.getElementById('capacityBarFill');
+    fillEl.style.width = pct + '%';
+    fillEl.style.background = isFull ? 'var(--crimson)' : 'var(--gold)';
+    document.getElementById('capacityPanel').classList.toggle('full', isFull);
+    CONFIG.MAP_FULL = isFull;
+    CONFIG.MAP_NAME = mapName;
+
+    const step1 = document.getElementById('step1Section');
+    if (isFull) {
+      step1.style.display = 'none';
+      document.getElementById('registerArea').style.display = 'none';
+    } else {
+      step1.style.display = 'block';
+    }
+
     // Regenerate the QR so it reflects the live UPI ID / amount, not the fallback.
     generateUpiQr();
   } catch (err) {
@@ -647,6 +696,13 @@ document.getElementById('deployBtn').addEventListener('click', async function ()
       body: JSON.stringify(payload)
     });
     const result = await res.json();
+    if (result.status === 'full') {
+      alert("Sorry — " + (CONFIG.MAP_NAME || 'this map') + " just hit its player limit while you were filling this in. Registration is now closed for this round.");
+      btn.disabled = false;
+      btn.textContent = 'Deploy Entry';
+      loadLiveSettings();
+      return;
+    }
     if (result.status !== 'success') throw new Error(result.message || 'Server error');
 
     document.getElementById('registerArea').style.display = 'none';
