@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VIRGO YT 707 — BGMI Scrims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+:root{
+  --bg:#090912;--s1:#0f0f1c;--s2:#15152a;--s3:#1c1c35;
+  --b:#20203a;--b2:#2a2a48;
+  --g:#f5c842;--g2:rgba(245,200,66,.1);--g3:rgba(245,200,66,.05);--gb:rgba(245,200,66,.3);
+  --r:#ff3b5c;--r2:rgba(255,59,92,.12);
+  --gr:#39d98a;--gr2:rgba(57,217,138,.12);
+  --t1:#e8e6f0;--t2:#9896b0;--t3:#5a5878;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+.rj{font-family:'Rajdhani',sans-serif;}
+.mono{font-family:'JetBrains Mono',monospace;}
+button,input,select{font-family:inherit;outline:none;}
+button{cursor:pointer;touch-action:manipulation;}
+a{color:inherit;text-decoration:none;}
+
+/* SCREENS */
+.scr{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;background:var(--bg);}
+.scr.on{display:flex;}
+.sc{flex:1;max-width:540px;margin:0 auto;padding:20px 18px 80px;width:100%;}
+
+/* LOADING */
+#s-load{align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 600px 400px at 50% 30%,rgba(245,200,66,.06),transparent 60%),var(--bg);}
+.load-logo{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;color:var(--g);letter-spacing:.08em;animation:breathe 1.6s ease-in-out infinite;}
+.load-sub{font-size:12px;color:var(--t3);letter-spacing:.2em;text-transform:uppercase;margin-top:8px;}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.97)}}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:30;background:rgba(9,9,18,.97);border-bottom:1px solid var(--b);
+  display:flex;align-items:center;justify-content:space-between;padding:12px 18px;}
+.hdr-brand{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--g);letter-spacing:.06em;}
+.hdr-r{display:flex;align-items:center;gap:10px;}
+.hdr-link{font-size:18px;line-height:1;opacity:.7;transition:opacity .15s;}
+.hdr-link:hover{opacity:1;}
+.avbtn{width:32px;height:32px;border-radius:50%;border:2px solid var(--gb);background:var(--s2);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.avbtn img{width:100%;height:100%;object-fit:cover;}
+
+/* LOGIN */
+#s-login{align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 700px 500px at 50% 0%,rgba(245,200,66,.07),transparent 55%),var(--bg);}
+.lbox{width:100%;max-width:360px;padding:24px;text-align:center;}
+.llogo{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--g);letter-spacing:.06em;line-height:1;margin-bottom:4px;}
+.ltag{font-size:10px;color:var(--t3);letter-spacing:.25em;text-transform:uppercase;margin-bottom:28px;display:block;}
+.lcard{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:28px;}
+.lcard h2{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+.lcard p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:22px;}
+.lnote{font-size:11px;color:var(--t3);margin-top:16px;line-height:1.5;}
+
+/* TABS (home screen) */
+.tabs{display:flex;gap:4px;background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:4px;margin-bottom:18px;}
+.tab{flex:1;text-align:center;padding:9px;border-radius:7px;font-size:13px;font-weight:600;
+  color:var(--t2);background:none;border:none;transition:all .15s;}
+.tab.on{background:var(--g);color:#0d0c00;}
+
+/* SESSION BANNER */
+.sess-banner{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--b2);border-radius:14px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden;}
+.sess-banner::before{content:"";position:absolute;top:-40%;right:-20%;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(245,200,66,.06),transparent 70%);}
+.sess-no{font-size:10px;color:var(--t3);letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;}
+.sess-name{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--t1);letter-spacing:.03em;text-transform:uppercase;}
+.sess-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.chip{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 12px;letter-spacing:.08em;text-transform:uppercase;}
+.chip.map{color:var(--g);background:var(--g2);border:1px solid var(--gb);}
+.chip.mode{color:var(--t2);background:var(--s3);border:1px solid var(--b2);}
+.chip.time{color:var(--t3);background:var(--s3);border:1px solid var(--b2);font-family:'JetBrains Mono',monospace;}
+
+.closed-bar{background:var(--r2);border:1px solid rgba(255,59,92,.3);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--r);}
+.prize-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.pbox{background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:12px;text-align:center;}
+.pbox .pl{font-size:18px;margin-bottom:4px;}
+.pbox .pa{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--g);}
+.pbox .pb{font-size:10px;color:var(--t3);margin-top:2px;}
+
+.cap-card{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:16px;margin-bottom:16px;}
+.cap-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.cap-label{font-size:12px;color:var(--t2);}
+.cap-count{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--t2);}
+.cap-count b{color:var(--g);}
+.cbar{height:5px;background:var(--b2);border-radius:999px;overflow:hidden;}
+.cfill{height:100%;background:var(--g);border-radius:999px;transition:width .4s ease;}
+.cfill.full{background:var(--r);}
+
+.dl-chip{display:none;align-items:center;gap:8px;background:var(--r2);border:1px solid rgba(255,59,92,.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;}
+.dl-chip.on{display:flex;}
+.dl-chip .dt{font-family:'JetBrains Mono',monospace;color:var(--r);font-weight:600;}
+
+.reg-status-card{background:var(--gr2);border:1.5px solid rgba(57,217,138,.3);border-radius:12px;padding:14px;margin-bottom:16px;display:none;}
+.reg-status-card.on{display:block;}
+.rs-title{font-weight:700;font-size:14px;color:var(--gr);margin-bottom:4px;}
+.rs-sub{font-size:12px;color:var(--t2);}
+
+.start-btn{width:100%;background:var(--g);color:#0d0c00;border:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;padding:15px;border-radius:12px;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.start-btn:active{transform:scale(.98);}
+.start-btn:disabled{opacity:.3;cursor:not-allowed;}
+.links-row{display:flex;gap:10px;margin-top:12px;}
+.lpill{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;border:1px solid var(--b2);color:var(--t2);font-size:13px;font-weight:500;transition:all .15s;}
+.lpill:hover{border-color:var(--g);color:var(--g);}
+
+/* HISTORY TAB */
+.hist-item{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;}
+.hist-item:hover{border-color:var(--b2);}
+.hist-item.reg{border-color:rgba(57,217,138,.3);}
+.hi-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.hi-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;}
+.hi-bdg{font-size:10px;padding:3px 9px;border-radius:999px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.hi-bdg.reg{background:var(--gr2);color:var(--gr);}
+.hi-bdg.none{background:var(--s3);color:var(--t3);}
+.hi-meta{font-size:12px;color:var(--t2);}
+.hi-slots{font-size:11px;color:var(--t3);margin-top:4px;}
+.hist-lock{text-align:center;padding:28px;color:var(--t3);font-size:13px;}
+
+/* STEPS */
+.steps{display:flex;gap:6px;margin-bottom:24px;}
+.step{flex:1;height:2px;border-radius:999px;background:var(--b2);}
+.step.done{background:var(--g);}
+
+/* FORM */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--t2);font-size:13px;padding:0;margin-bottom:20px;}
+.ph{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+.ps{font-size:13px;color:var(--t2);margin-bottom:22px;}
+.pblk{background:var(--s1);border:1.5px solid var(--b);border-radius:12px;padding:18px;margin-bottom:10px;position:relative;}
+.ptag{position:absolute;top:-11px;left:14px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.12em;background:var(--bg);padding:2px 10px;border-radius:4px;border:1.5px solid var(--g);color:var(--g);}
+.ptag.cap{border-color:var(--r);color:var(--r);}
+.f{margin-bottom:12px;}
+.f:last-child{margin-bottom:0;}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.f input{width:100%;background:var(--bg);border:1.5px solid var(--b2);color:var(--t1);padding:12px 13px;border-radius:8px;font-size:14px;transition:border-color .2s;}
+.f input:focus{border-color:var(--g);}
+.nxtbtn{width:100%;background:var(--g);color:#0d0c00;border:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:12px;margin-top:20px;}
+.nxtbtn:active{transform:scale(.98);}
+.nxtbtn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* PAYMENT */
+.qrblk{display:flex;gap:18px;margin-bottom:20px;flex-wrap:wrap;}
+.qrw{background:#fff;padding:10px;border-radius:12px;width:160px;height:160px;flex:none;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 0 1px var(--b2),0 0 30px -8px rgba(245,200,66,.25);}
+.qrw img{width:100%;height:100%;object-fit:contain;transition:opacity .3s;}
+.qrw .qrexp{position:absolute;inset:0;background:rgba(9,9,18,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:12px;color:var(--t1);border-radius:10px;text-align:center;}
+.qi .upi{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--g);margin-bottom:4px;}
+.qi .amt{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:var(--t1);line-height:1;}
+.qtrow{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.tc{background:var(--r2);border:1px solid rgba(255,59,92,.2);color:#ffb4bf;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;border-radius:999px;}
+.rfbtn{background:none;border:1px solid var(--b2);color:var(--t2);font-size:12px;padding:6px 12px;border-radius:999px;display:none;}
+.rfbtn:active{opacity:.7;}
+.paydet{background:var(--s1);border:1.5px solid var(--b);border-radius:12px;padding:14px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.paydet .dot{width:10px;height:10px;border-radius:50%;flex:none;}
+.paydet.waiting .dot{background:var(--g);animation:blink 1.2s infinite;}
+.paydet.ok .dot{background:var(--gr);animation:none;}
+.paydet.ss .dot{background:var(--t3);animation:none;}
+.paydet.rzp .dot{background:var(--g);animation:none;}
+.pay-method{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--gb);border-radius:12px;padding:16px;margin-bottom:12px;}
+.method-label{font-size:10px;color:var(--g);font-weight:700;letter-spacing:.12em;margin-bottom:6px;}
+.method-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+.method-sub,.method-note{font-size:12px;color:var(--t2);line-height:1.5;margin-top:4px;}
+.rzpbtn{width:100%;margin-top:14px;padding:13px;border:0;border-radius:9px;background:var(--g);color:#0d0c00;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:.04em;}
+.rzpbtn:disabled{opacity:.5;cursor:not-allowed;}
+.method-note{padding:10px 12px;background:var(--g3);border:1px dashed var(--gb);border-radius:9px;margin-bottom:14px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.pdt{font-weight:600;font-size:14px;}
+.pds{font-size:12px;color:var(--t2);margin-top:2px;}
+.proof{padding-top:18px;border-top:1px dashed var(--b2);}
+.ptitle{font-size:13px;font-weight:600;margin-bottom:12px;}
+.upbtn{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--b2);padding:14px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--t2);transition:all .15s;background:none;width:100%;}
+.upbtn.uploaded{border-color:var(--gr);color:var(--gr);}
+.sspr{width:100%;max-height:200px;object-fit:contain;border-radius:8px;margin-top:10px;display:none;border:1px solid var(--b);}
+.ocr{font-size:12px;margin-top:8px;font-family:'JetBrains Mono',monospace;display:none;}
+.ocr.ok{color:var(--gr);}
+.ocr.bad{color:var(--r);}
+.ocr.checking{color:var(--g);}
+.subbtn{width:100%;background:var(--g);color:#0d0c00;border:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:12px;margin-top:20px;}
+.subbtn:active{transform:scale(.98);}
+.subbtn:disabled{opacity:.3;cursor:not-allowed;}
+.subnote{font-size:12px;color:var(--t2);text-align:center;margin-top:10px;line-height:1.5;}
+
+/* ROOM */
+.shero{text-align:center;padding:32px 0 20px;}
+.shero-icon{width:56px;height:56px;border-radius:50%;border:2px solid var(--gr);color:var(--gr);font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.stitle{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:6px;}
+.ssub{font-size:13px;color:var(--t2);line-height:1.6;}
+.icard{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:18px;margin-bottom:14px;}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b);}
+.irow:last-child{border-bottom:none;}
+.il{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;}
+.iv{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;}
+.rhide{background:var(--g3);border:1px dashed var(--gb);border-radius:10px;padding:18px;text-align:center;margin-bottom:14px;}
+.rhl{font-size:12px;color:var(--t2);margin-bottom:6px;}
+.rht{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--g);}
+.rhs{font-size:11px;color:var(--t3);margin-top:4px;}
+
+/* PROFILE PANEL */
+.pov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:80;display:none;}
+.pov.on{display:block;}
+.ppanel{position:fixed;top:0;right:0;bottom:0;width:min(320px,92vw);background:var(--s1);border-left:1px solid var(--b);z-index:81;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;}
+.ppanel.open{transform:translateX(0);}
+.phdr{padding:20px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px;}
+.pav{width:44px;height:44px;border-radius:50%;border:2px solid var(--gb);}
+.pname{font-weight:700;font-size:15px;}
+.pemail{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.px{margin-left:auto;background:none;border:none;color:var(--t2);font-size:22px;}
+.pbody{flex:1;overflow-y:auto;padding:16px 20px;}
+.pst{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.hi{background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:12px;margin-bottom:8px;}
+.hiname{font-weight:700;font-size:14px;margin-bottom:4px;}
+.himeta{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.7;}
+.lobtn{margin:16px 20px;width:calc(100% - 40px);background:var(--r2);border:1px solid rgba(255,59,92,.3);color:var(--r);padding:12px;border-radius:10px;font-weight:700;font-size:14px;}
+.lobtn:active{opacity:.7;}
+
+/* NO SESSION */
+.noscr{text-align:center;padding:60px 20px;}
+.nosi{font-size:48px;margin-bottom:16px;}
+.noscr h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.noscr p{font-size:13px;color:var(--t2);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="scr on" id="s-load">
+  <div class="load-logo">VIRGO YT 707</div>
+  <div class="load-sub">BGMI Squad Scrims</div>
+</div>
+
+<div class="scr" id="s-login">
+  <div class="lbox">
+    <div class="llogo">VIRGO<br>YT707</div>
+    <span class="ltag">BGMI Squad Scrims</span>
+    <div class="lcard">
+      <h2>Sign In to Register</h2>
+      <p>Use your Google account to register your squad. Your session stays saved.</p>
+      <div id="googleBtn"></div>
+      <div class="lnote">Only used to identify your captain. Never posted publicly.</div>
+    </div>
+  </div>
+</div>
+
+<div class="scr" id="s-home">
+  <div class="hdr">
+    <div class="hdr-brand">VIRGO YT 707</div>
+    <div class="hdr-r">
+      <a class="hdr-link" id="hWa" href="#" target="_blank">💬</a>
+      <a class="hdr-link" id="hYt" href="#" target="_blank">▶</a>
+      <button class="avbtn" onclick="openProfile()"><img id="hAv" src="" alt=""></button>
+    </div>
+  </div>
+  <div class="sc">
+    <div class="tabs">
+      <button class="tab on" id="tab-current" onclick="switchTab('current')">🏟 Current</button>
+      <button class="tab" id="tab-history" onclick="switchTab('history')">📜 History</button>
+    </div>
+    <div id="tabCurrent"></div>
+    <div id="tabHistory" style="display:none"></div>
+  </div>
+</div>
+
+<div class="scr" id="s-form">
+  <div class="hdr">
+    <div class="hdr-brand">VIRGO YT 707</div>
+    <div class="hdr-r"><button class="avbtn" onclick="openProfile()"><img id="fAv" src="" alt=""></button></div>
+  </div>
+  <div class="sc">
+    <button class="back-btn" onclick="goScr('home')">← Back</button>
+    <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step"></div></div>
+    <div class="ph">Squad Roster</div>
+    <div class="ps" id="formSubhead">Enter your team details and all player info exactly as in-game.</div>
+    <div class="f"><label>Team Name</label><input type="text" id="fTeam" placeholder="e.g. TEAM ROYAL"></div>
+    <div class="f"><label>Captain's WhatsApp</label><input type="tel" id="fWa" placeholder="10-digit number" maxlength="13"></div>
+    <div style="margin-top:20px;" id="playerForms"></div>
+    <button class="nxtbtn" id="formNext" disabled onclick="goScr('payment')">Next — Payment →</button>
+  </div>
+</div>
+
+<div class="scr" id="s-payment">
+  <div class="hdr"><div class="hdr-brand">VIRGO YT 707</div></div>
+  <div class="sc">
+    <button class="back-btn" onclick="goScr('form')">← Back</button>
+    <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step done"></div></div>
+    <div class="ph">Pay Entry Fee</div>
+    <div class="ps" id="payIntro">Choose a payment method to secure your squad slot.</div>
+    <div id="rzpCard" class="pay-method" style="display:none">
+      <div class="method-label">PRIMARY PAYMENT</div>
+      <div class="method-title">Pay securely with Razorpay</div>
+      <div class="method-sub">UPI, cards and net banking. No screenshot is required.</div>
+      <button class="rzpbtn" id="rzpBtn" type="button" onclick="startRazorpay()">Pay ₹<span id="rzpAmt">0</span> securely →</button>
+    </div>
+    <div id="upiFallbackNote" class="method-note"><b>Direct UPI:</b> scan the official QR or tap the button. It works with Google Pay, PhonePe, Paytm, WhatsApp Pay, FamPay, MobiKwik, Navi, Junio and other compatible UPI apps.</div>
+    <div class="qrblk">
+      <div class="qrw"><img id="qrImg" src="assets/upi-qr.png" alt="Official VIRGO YT UPI QR code"></div>
+      <div class="qi">
+        <div class="upi" id="payUpi"></div>
+        <div class="amt">₹<span id="payAmt"></span></div>
+        <div class="qtrow"><div class="tc">Official QR · Always active</div></div>
+        <a class="lpill" id="upiOpenBtn" href="#" style="margin-top:12px;">Open in UPI app →</a>
+        <div style="font-size:12px;color:var(--t3);margin-top:8px;">Cards, net banking and UPI apps are also available through Razorpay when enabled.</div>
+      </div>
+    </div>
+    <div class="paydet waiting" id="payDet">
+      <div class="dot"></div>
+      <div>
+        <div class="pdt" id="pdT">Waiting for verified payment…</div>
+        <div class="pds" id="pdS">Your entry remains locked until payment is matched securely.</div>
+      </div>
+    </div>
+    <div class="proof" id="proofBlock">
+      <div class="ptitle">📎 Optional payment screenshot</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.5;margin:-4px 0 12px;">A screenshot can help support review, but it never confirms payment or unlocks entry.</div>
+      <button class="upbtn" id="upBtn" onclick="document.getElementById('ssFile').click()">
+        <span style="font-size:20px">📷</span><span id="upBtnT">Tap to upload screenshot</span>
+      </button>
+      <input type="file" id="ssFile" accept="image/*" style="display:none">
+      <img id="ssPreview" class="sspr" src="" alt="">
+      <div class="ocr" id="ocrMsg"></div>
+      <div class="f" style="margin-top:14px;">
+        <label>UTR / Transaction ID</label>
+        <input type="text" id="utrIn" placeholder="12-digit UTR or Transaction ID" inputmode="numeric" maxlength="20">
+      </div>
+    </div>
+    <button class="subbtn" id="subBtn" disabled onclick="submitReg()">Submit Registration</button>
+    <div class="subnote" id="subNote">Pay the entry fee and upload your screenshot to submit.</div>
+  </div>
+</div>
+
+<div class="scr" id="s-room">
+  <div class="hdr">
+    <div class="hdr-brand">VIRGO YT 707</div>
+    <div class="hdr-r"><button class="avbtn" onclick="openProfile()"><img id="rAv" src="" alt=""></button></div>
+  </div>
+  <div class="sc">
+    <div class="shero">
+      <div class="shero-icon">✓</div>
+      <div class="stitle">Entry Received!</div>
+      <div class="ssub" id="roomSub">Payment verified. Your squad is registered.</div>
+    </div>
+    <div id="roomPrizes" class="prize-row"></div>
+    <div id="roomInfo"></div>
+    <div id="roomLinks" class="links-row"></div>
+  </div>
+</div>
+
+<!-- Profile Panel -->
+<div class="pov" id="pov" onclick="closePP()"></div>
+<div class="ppanel" id="ppanel">
+  <div class="phdr">
+    <img class="pav" id="pav" src="" alt="">
+    <div><div class="pname" id="pname"></div><div class="pemail" id="pemail"></div></div>
+    <button class="px" onclick="closePP()">×</button>
+  </div>
+  <div class="pbody">
+    <div class="pst">Registration History</div>
+    <div id="phistList"></div>
+  </div>
+  <button class="lobtn" onclick="doLogout()">Log Out</button>
+</div>
+
+<script>
+const API  = "https://script.google.com/macros/s/AKfycbxBVNUc6C-rng6d3L-JlqelWX65GUWXF0YTrfUYgWN90fV622gg-H31d_GdqO8iN9JuXQ/exec";
+const GCID = "1062428369173-jka84t28t5ltgup9t292e7un4l1ajab3.apps.googleusercontent.com";
+const RAZORPAY_KEY = "";
+const STATIC_UPI_ID = "919153705685@wahdfcbank";
+const STATIC_UPI_NAME = "Virgo YT (Prince)";
+const STATIC_UPI_QR = "assets/upi-qr.png";
+
+let user=null, sess=null, allSessions=[], txnRef=null;
+let qrTID=null, qrSec=300, pollID=null;
+let payOK=false, ssB64=null, ssMime=null, ssOK=false;
+let paymentMode='upi', razorpayOrderId='', razorpayPaymentId='', razorpaySignature='';
+
+/* ── BOOT ── */
+window.addEventListener('load',async()=>{
+  try{const u=JSON.parse(localStorage.getItem('vyt_u')||'null');if(u&&u.email&&Date.now()-(u.at||0)<7*86400000){user=u;syncAv();}}catch(e){}
+  try{const c=JSON.parse(localStorage.getItem('vyt_sess')||'null');if(c&&Date.now()-(c._t||0)<180000)sess=c;}catch(e){}
+  try{const a=JSON.parse(localStorage.getItem('vyt_all')||'null');if(a&&Date.now()-(a._t||0)<300000)allSessions=a.data||[];}catch(e){}
+  initGoogleSignIn();
+  if(user)goScr('home');else goScr('login');
+  fetchFresh();
+});
+
+function initGoogleSignIn(){
+  if(!window.google?.accounts?.id){setTimeout(initGoogleSignIn,500);return;}
+  google.accounts.id.initialize({client_id:GCID,callback:onLogin,auto_select:false});
+  google.accounts.id.renderButton(document.getElementById('googleBtn'),{theme:'filled_black',size:'large',shape:'pill',text:'signin_with',width:280});
+}
+function normalizeSession(s){
+  if(!s)return s;
+  if(s.maxSlots==null&&s.maxTeams!=null)s.maxSlots=s.maxTeams;
+  if(s.slotsUsed==null&&s.teamsRegistered!=null)s.slotsUsed=s.teamsRegistered;
+  if(s.roomPassword==null&&s.roomPw!=null)s.roomPassword=s.roomPw;
+  if(s.registrationOpen==null)s.registrationOpen=!s.deadline||new Date()<new Date(s.deadline);
+  return s;
+}
+async function syncRegistrationState(){
+  if(!user||!sess?.id)return;
+  try{
+    const r=await fetch(API+'?action=checkReg&email='+encodeURIComponent(user.email)+'&sessionId='+encodeURIComponent(sess.id));
+    const d=await r.json();
+    if(d.registered)localStorage.setItem('vyt_reg_'+sess.id,JSON.stringify({status:d.status||'Registered',at:Date.now()}));
+  }catch(e){}
+}
+async function fetchFresh(){
+  try{
+    const[r1,r2]=await Promise.all([fetch(API),fetch(API+'?action=history')]);
+    const d1=await r1.json(),d2=await r2.json();
+    if(d1.status==='active'){
+      sess=normalizeSession(d1.session);sess._t=Date.now();localStorage.setItem('vyt_sess',JSON.stringify(sess));syncRegistrationState();
+    }else if(d1.status==='no_session'){sess=null;localStorage.removeItem('vyt_sess');}
+    if(Array.isArray(d2.sessions)){
+      allSessions=d2.sessions.map(normalizeSession);localStorage.setItem('vyt_all',JSON.stringify({data:allSessions,_t:Date.now()}));
+    }else if(sess&&!allSessions.length){allSessions=[sess];localStorage.setItem('vyt_all',JSON.stringify({data:allSessions,_t:Date.now()}));}
+    if(document.getElementById('s-home').classList.contains('on'))renderHome();
+  }catch(e){console.warn('Fresh data unavailable',e);}
+}
+
+/* ── AUTH ── */
+function onLogin(resp){
+  try{
+    const p=decodeJWT(resp.credential);user={name:p.name,email:p.email,pic:p.picture,at:Date.now()};
+    localStorage.setItem('vyt_u',JSON.stringify(user));syncAv();goScr('home');fetchFresh();
+  }catch(e){alert('Google sign-in could not be completed. Please try again.');}
+}
+function doLogout(){localStorage.removeItem('vyt_u');user=null;closePP();goScr('login');}
+function decodeJWT(t){const b=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(atob(b).split('').map(c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join('')));}
+function syncAv(){if(!user)return;['hAv','fAv','rAv','pav'].forEach(id=>{const e=document.getElementById(id);if(e)e.src=user.pic;});const n=document.getElementById('pname'),e=document.getElementById('pemail');if(n)n.textContent=user.name;if(e)e.textContent=user.email;}
+
+/* ── SCREENS ── */
+function goScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on');window.scrollTo(0,0);if(id==='home')renderHome();if(id==='payment')initPay();if(id==='room')renderRoom();}
+
+/* ── HOME / TABS ── */
+let curTab='current';
+function switchTab(t){
+  curTab=t;
+  ['current','history'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('on',x===t);
+    document.getElementById('tab'+(x==='current'?'Current':'History')).style.display=x===t?'':'none';
+  });
+  if(t==='history')renderHistory();
+}
+
+function renderHome(){
+  if(curTab==='current')renderCurrent();
+  else renderHistory();
+}
+
+async function renderCurrent(){
+  const el=document.getElementById('tabCurrent');
+  if(!sess){
+    el.innerHTML=`<div class="noscr"><div class="nosi">🎮</div><h2>No Active Tournament</h2><p>No tournament is currently open for registration.<br>Check the WhatsApp group for the next round.</p></div>`;
+    return;
+  }
+  const s=normalizeSession(sess);
+  if(s.whatsapp){document.getElementById('hWa').href=s.whatsapp;}
+  if(s.youtube){document.getElementById('hYt').href=s.youtube;}
+  const slots=Number(s.slotsUsed||0),max=Number(s.maxSlots||25);
+  const full=slots>=max,open=s.registrationOpen&&!full;
+  const modeLabel={solo:'Solo',duo:'Duo',squad:'Squad 4v4'}[s.mode]||'Squad 4v4';
+
+  // Check if user already registered
+  let isReg=false;
+  try{const hist=JSON.parse(localStorage.getItem('vyt_hist')||'[]');isReg=hist.some(h=>h.sessionId===s.id)||!!localStorage.getItem('vyt_reg_'+s.id);}catch(e){}
+
+  el.innerHTML=`
+    <div class="sess-banner">
+      <div class="sess-no">Session #${s.sessionNo||1}</div>
+      <div class="sess-name">${esc(s.name||'Tournament')}</div>
+      <div class="sess-chips">
+        <span class="chip map">${(s.map||'').toUpperCase()}</span>
+        <span class="chip mode">${modeLabel}</span>
+        ${s.startTime?`<span class="chip time">Starts ${fmtTime(s.startTime)}</span>`:''}
+      </div>
+    </div>
+    <div class="prize-row">
+      <div class="pbox"><div class="pl">🥇</div><div class="pa">${esc(s.prize1||'₹0')}</div><div class="pb">1st</div></div>
+      <div class="pbox"><div class="pl">🥈</div><div class="pa">${esc(s.prize2||'₹0')}</div><div class="pb">2nd</div></div>
+      <div class="pbox"><div class="pl">🥉</div><div class="pa">${esc(s.prize3||'₹0')}</div><div class="pb">3rd</div></div>
+    </div>
+    <div class="cap-card">
+      <div class="cap-top"><span class="cap-label">Live Slots</span><span class="cap-count"><b>${slots}</b>/${max}</span></div>
+      <div class="cbar"><div class="cfill${full?' full':''}" style="width:${max>0?Math.min(100,slots/max*100):0}%"></div></div>
+    </div>
+    <div class="dl-chip${s.deadline?' on':''}" id="dlChip"><span>⏰ Registration closes in</span><span class="dt" id="dlT">—</span></div>
+    <div class="reg-status-card${isReg?' on':''}"><div class="rs-title">✓ You're Registered!</div><div class="rs-sub">Your squad is in. Check room info when the time comes.</div></div>
+    ${!open?`<div class="closed-bar">${full?'🔒 This session is FULL.':'⛔ Registration is closed.'}</div>`:''}
+    <button class="start-btn" id="startBtn" ${!open||isReg?'disabled':''} onclick="goScr('form')">
+      ${isReg?'Already Registered ✓':open?'Register Your Squad →':'Registration Closed'}
+    </button>
+    <div class="links-row">
+      <a class="lpill" href="${esc(s.whatsapp||'#')}" target="_blank">💬 WhatsApp</a>
+      <a class="lpill" href="${esc(s.youtube||'#')}" target="_blank">▶ Watch Live</a>
+    </div>`;
+
+  if(s.deadline)startDLTimer(new Date(s.deadline));
+}
+
+let dlTID=null;
+function startDLTimer(dl){
+  clearInterval(dlTID);
+  function tick(){
+    const diff=dl-new Date(),el=document.getElementById('dlT');
+    if(!el){clearInterval(dlTID);return;}
+    if(diff<=0){el.textContent='00:00';clearInterval(dlTID);renderCurrent();return;}
+    const h=Math.floor(diff/3600000),m=Math.floor(diff%3600000/60000),s=Math.floor(diff%60000/1000);
+    el.textContent=(h?h+'h ':'')+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
+  }
+  tick();dlTID=setInterval(tick,1000);
+}
+
+async function renderHistory(){
+  const el=document.getElementById('tabHistory');
+  if(!allSessions.length){el.innerHTML='<div class="noscr"><div class="nosi">📜</div><h2>No History Yet</h2><p>Past tournaments will appear here.</p></div>';return;}
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('vyt_hist')||'[]');}catch(e){}
+  const regIds=new Set(hist.map(h=>h.sessionId));
+  el.innerHTML=allSessions.map(raw=>{const s=normalizeSession(raw);
+    const isReg=regIds.has(s.id);
+    const isAct=s.active==='true'||s.active===true;
+    return `<div class="hist-item${isReg?' reg':''}" onclick="viewSession('${s.id}','${esc(s.name||'')}',${isReg})">
+      <div class="hi-head">
+        <div class="hi-name">${esc(s.name)}</div>
+        <span class="hi-bdg ${isReg?'reg':'none'}">${isReg?'REGISTERED':isAct?'ACTIVE':'ENDED'}</span>
+      </div>
+      <div class="hi-meta">Session #${s.sessionNo||'—'} · ${(s.map||'').toUpperCase()} · ${({solo:'Solo',duo:'Duo',squad:'Squad'}[s.mode]||'Squad')}</div>
+      <div class="hi-slots">👥 ${s.slotCount||0}/${s.maxSlots||25} slots${s.deadline?' · ⏰ '+fmtDT(s.deadline):''}</div>
+    </div>`;
+  }).join('');
+}
+
+function viewSession(id,name,isReg){
+  if(!isReg){
+    alert('"'+name+'" — You are not registered for this session.\n\nYou can only view session details if you have registered.');
+    return;
+  }
+  // Find in history and show room info
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('vyt_hist')||'[]');}catch(e){}
+  const h=hist.find(x=>x.sessionId===id);
+  if(h){if(sess&&String(sess.id)===String(id))goScr('room');else alert('Room details are available when this session is active.');}
+}
+
+/* ── FORM ── */
+function buildPlayerForms(){
+  const mode=sess?.mode||'squad';
+  const count=mode==='solo'?1:mode==='duo'?2:4;
+  const el=document.getElementById('playerForms');
+  const sub=document.getElementById('formSubhead');
+  const modeLabel={solo:'Solo player',duo:'Both players',squad:'All 4 players'};
+  sub.textContent='Enter '+(modeLabel[mode]||'all players')+' info exactly as in-game.';
+  let html='';
+  for(let i=1;i<=count;i++){
+    html+=`<div class="pblk"><span class="ptag${i===1?' cap':''}">${i===1?'PLAYER 01 · CAPTAIN':'PLAYER 0'+i}</span>
+      <div class="f"><label>IGN</label><input type="text" id="p${i}n" placeholder="In-game name"></div>
+      <div class="f"><label>BGMI UID</label><input type="text" id="p${i}u" inputmode="numeric" placeholder="5XXXXXXXXX"></div>
+    </div>`;
+  }
+  el.innerHTML=html;
+  // Add input listeners
+  document.querySelectorAll('#playerForms input').forEach(inp=>inp.addEventListener('input',chkForm));
+}
+
+const BASE_IDS=['fTeam','fWa'];
+function chkForm(){
+  const mode=sess?.mode||'squad';
+  const count=mode==='solo'?1:mode==='duo'?2:4;
+  const pids=[];for(let i=1;i<=count;i++){pids.push('p'+i+'n','p'+i+'u');}
+  const all=[...BASE_IDS,...pids].every(id=>(document.getElementById(id)||{}).value?.trim());
+  const wa=/^\+?\d{10,13}$/.test((document.getElementById('fWa')||{}).value?.trim()||'');
+  document.getElementById('formNext').disabled=!(all&&wa);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  BASE_IDS.forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',chkForm);});
+});
+
+/* ── PAYMENT ── */
+function initPay(){
+  payOK=false;ssB64=null;ssOK=false;paymentMode='upi';razorpayOrderId='';razorpayPaymentId='';razorpaySignature='';
+  clearInterval(pollID);clearInterval(qrTID);txnRef='SCRIM'+Math.random().toString(36).slice(2,8).toUpperCase();
+  const amount=sess?.entryFee||'20',key=sess?.razorpayKeyId||RAZORPAY_KEY,canUse=!!key&&typeof window.Razorpay==='function';
+  document.getElementById('payUpi').textContent=STATIC_UPI_ID;document.getElementById('payAmt').textContent=amount;document.getElementById('rzpAmt').textContent=amount;
+  document.getElementById('qrImg').src=STATIC_UPI_QR;
+  document.getElementById('upiOpenBtn').href=`upi://pay?pa=${encodeURIComponent(STATIC_UPI_ID)}&pn=${encodeURIComponent(STATIC_UPI_NAME)}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent('BGMI '+txnRef)}`;
+  document.getElementById('rzpCard').style.display=canUse?'block':'none';document.getElementById('upiFallbackNote').style.display='block';document.getElementById('proofBlock').style.display='block';
+  document.getElementById('ocrMsg').style.display='none';document.getElementById('ssPreview').style.display='none';document.getElementById('utrIn').value='';document.getElementById('subBtn').disabled=true;
+  setPaySt(canUse?'rzp':'waiting');pollID=setInterval(pollPay,8000);chkSub();
+}
+
+async function startRazorpay(){
+  const key=sess?.razorpayKeyId||RAZORPAY_KEY;
+  if(!key||typeof window.Razorpay!=='function'){alert('Razorpay is not configured yet. Use the UPI fallback below.');return;}
+  const btn=document.getElementById('rzpBtn');btn.disabled=true;btn.textContent='Preparing secure checkout…';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'create_razorpay_order',sessionId:sess?.id,txnRef,amount:Number(sess?.entryFee||0)})});
+    const d=await r.json();if(d.status!=='success'||!d.orderId)throw new Error(d.message||'Razorpay order could not be created');
+    razorpayOrderId=d.orderId;paymentMode='razorpay';
+    const rp=new Razorpay({key,order_id:razorpayOrderId,amount:d.amount,currency:d.currency||'INR',name:'VIRGO YT 707',description:(sess?.name||'BGMI Scrim')+' entry',prefill:{name:user?.name||'',email:user?.email||'',contact:document.getElementById('fWa')?.value||''},notes:{sessionId:sess?.id||'',txnRef},handler:function(response){
+      razorpayPaymentId=response.razorpay_payment_id||'';razorpaySignature=response.razorpay_signature||'';payOK=!!razorpayPaymentId;setPaySt(payOK?'ok':'rzp');chkSub();
+    },modal:{ondismiss:function(){if(!payOK){paymentMode='upi';btn.disabled=false;btn.textContent='Pay ₹'+(sess?.entryFee||'20')+' securely →';setPaySt('waiting');chkSub();}}}
+    });
+    rp.on('payment.failed',function(){paymentMode='upi';payOK=false;setPaySt('waiting');chkSub();});rp.open();
+  }catch(e){btn.disabled=false;btn.textContent='Pay ₹'+(sess?.entryFee||'20')+' securely →';alert(e.message||'Could not open Razorpay checkout.');}
+}
+
+function genQR(){
+  document.getElementById('qrImg').src=STATIC_UPI_QR;
+}
+function tickQR(){
+  qrSec--;
+  if(qrSec<=0){clearInterval(qrTID);document.getElementById('qrT').textContent='00:00';document.getElementById('qrExp').style.display='flex';document.getElementById('rfBtn').style.display='inline-block';return;}
+  document.getElementById('qrT').textContent=String(Math.floor(qrSec/60)).padStart(2,'0')+':'+String(qrSec%60).padStart(2,'0');
+}
+
+async function pollPay(){
+  if(payOK){clearInterval(pollID);return;}
+  try{
+    const utr=(document.getElementById('utrIn')?.value||'').trim();
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'check_payment',ref:txnRef,amount:Number(sess?.entryFee||20),utr})});
+    const d=await r.json();
+    if(d.paid){payOK=true;clearInterval(pollID);setPaySt('ok');chkSub();}
+  }catch(e){}
+}
+
+function setPaySt(st){
+  const el=document.getElementById('payDet');el.className='paydet '+st;
+  const t=document.getElementById('pdT'),s=document.getElementById('pdS');
+  if(st==='waiting'){t.textContent='Waiting for verified payment…';s.textContent='Pay, then enter your UTR. Entry stays locked until the payment is matched.';}
+  else if(st==='rzp'){t.textContent='Choose a verified payment method';s.textContent='Use Razorpay for cards, net banking or supported UPI apps, or use the direct UPI QR below.';}
+  else if(st==='ok'){t.textContent='✅ Payment verified!';s.textContent=paymentMode==='razorpay'?'Razorpay confirmed your payment.':'Your UTR matched a received-payment notification.';}
+  else{t.textContent='Screenshot received — not confirmation';s.textContent='Only a verified Razorpay result or matched received-payment notification unlocks entry.';}
+}
+
+document.getElementById('ssFile').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  ssMime=f.type;
+  const r=new FileReader();
+  r.onload=ev=>{
+    ssB64=ev.target.result;
+    const p=document.getElementById('ssPreview');p.src=ssB64;p.style.display='block';
+    document.getElementById('upBtn').classList.add('uploaded');
+    document.getElementById('upBtnT').textContent='Screenshot uploaded ✓';
+    runOCR(ssB64);
+  };
+  r.readAsDataURL(f);
+});
+
+async function runOCR(img){
+  const el=document.getElementById('ocrMsg');
+  el.className='ocr checking';el.textContent='🔍 Verifying screenshot…';el.style.display='block';
+  try{
+    if(typeof Tesseract==='undefined')throw new Error('not loaded');
+    const res=await Tesseract.recognize(img,'eng');
+    const txt=(res.data.text||'').toLowerCase().replace(/\s+/g,'');
+    const utrM=txt.match(/\d{10,22}/);
+    ssOK=false;el.className='ocr ok';el.textContent='📎 Screenshot stored for support only — it cannot confirm payment.';
+    if(utrM&&!document.getElementById('utrIn').value)document.getElementById('utrIn').value=utrM[0];
+    if(!payOK)setPaySt('ss');
+  }catch(e){ssOK=false;el.className='ocr ok';el.textContent='📎 Screenshot stored for support only — it cannot confirm payment.';if(!payOK)setPaySt('ss');}
+  chkSub();
+}
+
+document.getElementById('utrIn').addEventListener('input',chkSub);
+
+function chkSub(){
+  const utr=(document.getElementById('utrIn').value||'').trim();
+  const razorpayOk=paymentMode==='razorpay'&&payOK&&razorpayPaymentId&&razorpaySignature;
+  const upiOk=paymentMode!=='razorpay'&&payOK&&utr.length>=10;
+  const ok=!!(razorpayOk||upiOk);document.getElementById('subBtn').disabled=!ok;
+  document.getElementById('subNote').textContent=ok?'Payment is verified — submit your registration.':paymentMode==='razorpay'&&!payOK?'Complete a Razorpay payment to continue.':!utr?'Pay with the QR or a UPI app, then enter the UTR / transaction ID.':'Waiting for your received payment to be matched. Screenshots cannot unlock entry.';
+}
+
+/* ── SUBMIT ── */
+async function submitReg(){
+  const btn=document.getElementById('subBtn');btn.disabled=true;btn.textContent='Submitting…';
+  clearInterval(pollID);
+  const mode=sess?.mode||'squad';
+  const count=mode==='solo'?1:mode==='duo'?2:4;
+  const payload={
+    type:'registration',sessionId:sess?.id||'',
+    teamName:document.getElementById('fTeam').value.trim(),
+    googleName:user.name,googleEmail:user.email,
+    whatsapp:document.getElementById('fWa').value.trim(),
+    txnRef,utr:document.getElementById('utrIn').value.trim(),
+    screenshotBase64:ssB64,screenshotMime:ssMime,
+    autoVerified:payOK,
+    paymentMethod:paymentMode==='razorpay'?'Razorpay':(payOK?'UPI-AutoDetected':'Unverified'),
+    razorpayOrderId,razorpayPaymentId,razorpaySignature
+  };
+  for(let i=1;i<=4;i++){
+    payload['p'+i+'name']=i<=count?(document.getElementById('p'+i+'n')?.value.trim()||''):'';
+    payload['p'+i+'uid']=i<=count?(document.getElementById('p'+i+'u')?.value.trim()||''):'';
+  }
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(d.status==='success'){
+      const status=payOK?'AutoVerified':'Pending';
+      saveHist({team:payload.teamName,map:sess?.map,session:sess?.name,sessionId:sess?.id,ts:Date.now(),txnRef,status});
+      localStorage.setItem('vyt_reg_'+sess.id,JSON.stringify({status,at:Date.now()}));goScr('room');
+    }else if(d.status==='full'){alert('Sorry — session is full!');goScr('home');}
+    else if(d.status==='closed'){alert('Registration is closed.');goScr('home');}
+    else if(d.status==='duplicate'){alert('Already registered for this session!');localStorage.setItem('vyt_reg_'+sess.id,JSON.stringify({status:'Registered',at:Date.now()}));goScr('room');}
+    else if(d.status==='payment_invalid'){throw new Error('Razorpay payment verification failed. Please contact the organizer before retrying.');}
+    else throw new Error(d.message||'Error');
+  }catch(e){
+    alert('Could not submit — check connection.\n'+e.message);
+    btn.disabled=false;btn.textContent='Submit Registration';
+    pollID=setInterval(pollPay,8000);
+  }
+}
+
+/* ── ROOM ── */
+function renderRoom(){
+  const s=normalizeSession(sess)||{};
+  document.getElementById('roomPrizes').innerHTML=[
+    {p:'🥇',a:s.prize1||'₹0',l:'1st'},{p:'🥈',a:s.prize2||'₹0',l:'2nd'},{p:'🥉',a:s.prize3||'₹0',l:'3rd'}
+  ].map(x=>`<div class="pbox"><div class="pl">${x.p}</div><div class="pa">${esc(x.a)}</div><div class="pb">${x.l}</div></div>`).join('');
+  const el=document.getElementById('roomInfo');
+  if(s.roomReady&&s.roomId){
+    el.innerHTML=`<div class="icard">
+      <div class="irow"><div class="il">Room ID</div><div class="iv">${esc(s.roomId)}</div></div>
+      <div class="irow"><div class="il">Password</div><div class="iv">${esc(s.roomPassword||'—')}</div></div>
+      ${s.startTime?`<div class="irow"><div class="il">Match Starts</div><div class="iv">${fmtDT(s.startTime)}</div></div>`:''}
+    </div>`;
+  }else{
+    const t=s.revealTime?new Date(s.revealTime).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true}).toUpperCase():'a set time';
+    el.innerHTML=`<div class="rhide">
+      <div class="rhl">Room ID & Password will be revealed at</div>
+      <div class="rht">${t} IST</div>
+      <div class="rhs">This page auto-updates — come back at reveal time.</div>
+    </div>`;
+    if(s.revealTime)setTimeout(pollRoom,30000);
+  }
+  document.getElementById('roomLinks').innerHTML=`
+    <a class="lpill" href="${esc(s.whatsapp||'#')}" target="_blank">💬 WhatsApp</a>
+    <a class="lpill" href="${esc(s.youtube||'#')}" target="_blank">▶ Watch Live</a>`;
+}
+
+async function pollRoom(){
+  try{const r=await fetch(API);const d=await r.json();if(d.status==='active'){sess=normalizeSession(d.session);renderRoom();}if(!sess?.roomReady)setTimeout(pollRoom,30000);}catch(e){}
+}
+
+/* ── PROFILE ── */
+function openProfile(){
+  renderPHist();
+  document.getElementById('pov').classList.add('on');
+  requestAnimationFrame(()=>document.getElementById('ppanel').classList.add('open'));
+}
+function closePP(){document.getElementById('ppanel').classList.remove('open');setTimeout(()=>document.getElementById('pov').classList.remove('on'),250);}
+function saveHist(e){let h=[];try{h=JSON.parse(localStorage.getItem('vyt_hist')||'[]');}catch(x){}h=h.filter(x=>x.txnRef!==e.txnRef);h.unshift(e);localStorage.setItem('vyt_hist',JSON.stringify(h.slice(0,30)));}
+function renderPHist(){let h=[];try{h=JSON.parse(localStorage.getItem('vyt_hist')||'[]');}catch(e){}const el=document.getElementById('phistList');if(!h.length){el.innerHTML='<div style="color:var(--t3);font-size:13px;">No registrations yet.</div>';return;}el.innerHTML=h.map(e=>`<div class="hi"><div class="hiname">${esc(e.team||'Team')}</div><div class="himeta">${(e.map||'').toUpperCase()} · ${esc(e.session||'—')}<br>${e.ts?new Date(e.ts).toLocaleDateString('en-IN'):''}<br>Ref: ${e.txnRef||'—'}</div></div>`).join('');}
+
+/* ── OVERRIDE: build player forms when going to form screen ── */
+const origGoScr = goScr;
+function goScr(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const target=document.getElementById('s-'+id);if(!target)return;target.classList.add('on');window.scrollTo(0,0);
+  const footer=document.getElementById('siteFooter');if(footer)footer.style.display=(id==='home'||id==='room')?'flex':'none';
+  if(id==='home')renderHome();if(id==='form')buildPlayerForms();if(id==='payment')initPay();if(id==='room')renderRoom();
+}
+
+/* ── UTILS ── */
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtTime(v){if(!v)return '';try{return new Date(v).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:true}).toUpperCase();}catch(e){return '';}}
+function fmtDT(v){if(!v)return '';try{return new Date(v).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',hour12:true,month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return v;}}
+
+/* ── POLICY MODAL ── */
+function openPolicy(id){
+  document.getElementById('pmov').classList.add('on');
+  document.getElementById('pmodal').classList.add('open');
+  showPolicy(id);
+}
+function closePolicy(){
+  document.getElementById('pmov').classList.remove('on');
+  document.getElementById('pmodal').classList.remove('open');
+}
+function showPolicy(id){
+  document.querySelectorAll('.psec').forEach(s=>s.style.display='none');
+  document.getElementById('ps-'+id).style.display='block';
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pt-'+id).classList.add('on');
+  document.getElementById('pmodal-body').scrollTop=0;
+}
+</script>
+
+<!-- FOOTER (visible on home + room screens) -->
+<div style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:20;background:rgba(9,9,18,.95);
+  border-top:1px solid #20203a;padding:10px 18px;align-items:center;
+  justify-content:center;gap:14px;flex-wrap:wrap;backdrop-filter:blur(8px);" id="siteFooter">
+  <span style="font-size:11px;color:#5a5878;">© 2026 VIRGO YT 707</span>
+  <button onclick="openPolicy('about')" style="background:none;border:none;font-size:11px;color:#5a5878;cursor:pointer;padding:0;">About</button>
+  <button onclick="openPolicy('privacy')" style="background:none;border:none;font-size:11px;color:#5a5878;cursor:pointer;padding:0;">Privacy</button>
+  <button onclick="openPolicy('refund')" style="background:none;border:none;font-size:11px;color:#5a5878;cursor:pointer;padding:0;">Refund Policy</button>
+  <button onclick="openPolicy('return')" style="background:none;border:none;font-size:11px;color:#5a5878;cursor:pointer;padding:0;">Returns</button>
+  <button onclick="openPolicy('disclaimer')" style="background:none;border:none;font-size:11px;color:#5a5878;cursor:pointer;padding:0;">Disclaimer</button>
+</div>
+
+<!-- POLICY MODAL -->
+<div class="pov" id="pmov" onclick="closePolicy()" style="z-index:200;"></div>
+<div id="pmodal" style="position:fixed;inset:0;z-index:201;background:var(--s1);transform:translateY(100%);transition:transform .3s ease;display:flex;flex-direction:column;">
+  <!-- Modal header -->
+  <div style="padding:16px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex:none;background:var(--bg);">
+    <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--g);letter-spacing:.04em;text-transform:uppercase;">VIRGO YT 707</span>
+    <button onclick="closePolicy()" style="background:none;border:none;color:var(--t2);font-size:24px;line-height:1;">×</button>
+  </div>
+  <!-- Policy tabs -->
+  <div style="display:flex;gap:4px;padding:12px 16px;border-bottom:1px solid var(--b);flex:none;overflow-x:auto;background:var(--bg);">
+    <button class="ptab on" id="pt-about" onclick="showPolicy('about')" style="flex:none;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;">About</button>
+    <button class="ptab" id="pt-refund" onclick="showPolicy('refund')" style="flex:none;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;">Refund</button>
+    <button class="ptab" id="pt-return" onclick="showPolicy('return')" style="flex:none;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;">Return</button>
+    <button class="ptab" id="pt-privacy" onclick="showPolicy('privacy')" style="flex:none;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;">Privacy</button>
+    <button class="ptab" id="pt-disclaimer" onclick="showPolicy('disclaimer')" style="flex:none;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:none;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap;">Disclaimer</button>
+  </div>
+  <!-- Policy content -->
+  <div id="pmodal-body" style="flex:1;overflow-y:auto;padding:22px 18px 40px;">
+
+    <div class="psec" id="ps-about">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:4px;">About</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px;">VIRGO YT 707 — BGMI Scrim Tournaments</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:14px;">VIRGO YT 707 is an independent BGMI (Battlegrounds Mobile India) tournament organizer operating online scrim tournaments for competitive players across India.</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:14px;">We provide a registration platform for squads to participate in competitive scrims with real prize pools.</p>
+      <div style="font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin:18px 0 10px;">Contact</div>
+      <div style="background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">EMAIL</div>
+        <a href="mailto:imamericanyess@gmail.com" style="font-size:14px;color:var(--g);">imamericanyess@gmail.com</a>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">YOUTUBE</div>
+        <a href="https://www.youtube.com/@VirgoYT707" target="_blank" style="font-size:14px;color:var(--g);">@VirgoYT707</a>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">WHATSAPP</div>
+        <a href="https://chat.whatsapp.com/E8lXkGkA4ShE9yRrnOWhcC" target="_blank" style="font-size:14px;color:var(--g);">Community Group</a>
+      </div>
+    </div>
+
+    <div class="psec" id="ps-refund" style="display:none;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:4px;">Refund Policy</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px;">Last updated: July 2026</div>
+      <div style="background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3);border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px;color:#e8e6f0;line-height:1.7;">
+        ⚠️ <strong>NO REFUNDS.</strong> Once payment is received and registration is confirmed, no refund will be issued under any circumstances. This is a private service — if you pay, you receive the service, guaranteed.
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">No Refund Applies When:</div>
+      <ul style="padding-left:18px;font-size:14px;color:var(--t2);line-height:1.9;">
+        <li>You voluntarily cannot attend</li>
+        <li>Internet or device issues on your end</li>
+        <li>You are disqualified for rule violations</li>
+        <li>You change your mind after registration</li>
+        <li>Tournament is completed regardless of result</li>
+      </ul>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Only Exception — Technical Failure:</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">If payment was successfully deducted from your account AND a website/system glitch prevented your registration from being recorded — only then will a refund be issued. Contact us within 24 hours with your UTR number as proof.</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Refunds in eligible cases: processed within 5–7 business days via original payment method.</p>
+      <p style="font-size:14px;color:var(--t2);">Contact: <a href="mailto:imamericanyess@gmail.com" style="color:var(--g);">imamericanyess@gmail.com</a></p>
+    </div>
+
+    <div class="psec" id="ps-return" style="display:none;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:4px;">Return Policy</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px;">Last updated: July 2026</div>
+      <div style="background:rgba(255,59,92,.1);border:1px solid rgba(255,59,92,.3);border-radius:10px;padding:14px;margin-bottom:18px;font-size:14px;color:#e8e6f0;line-height:1.7;">
+        🚫 <strong>NO RETURNS.</strong> This is a digital private service. There is nothing to return. Once you pay and registration is confirmed, the service is delivered.
+      </div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;margin-bottom:14px;">A tournament slot is a time-bound digital service. Once payment is received and registration is accepted, the transaction is complete and final. No cancellations or transfers are permitted.</p>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Technical Failure Exception:</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">If payment was deducted but registration failed due to a system error, refer to our Refund Policy. This is the only exception.</p>
+    </div>
+
+    <div class="psec" id="ps-privacy" style="display:none;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:4px;">Privacy Policy</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px;">Last updated: July 2026</div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">What We Collect</div>
+      <ul style="padding-left:18px;font-size:14px;color:var(--t2);line-height:1.9;">
+        <li>Google name and email (via Google Sign-In)</li>
+        <li>BGMI in-game name and UID</li>
+        <li>WhatsApp number</li>
+        <li>UPI transaction ID (UTR) and payment screenshot</li>
+        <li>Team name</li>
+      </ul>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">How We Use It</div>
+      <ul style="padding-left:18px;font-size:14px;color:var(--t2);line-height:1.9;">
+        <li>Confirm and manage tournament registration</li>
+        <li>Verify entry fee payment</li>
+        <li>Send match details (room ID, schedule)</li>
+        <li>Transfer prize winnings to winners</li>
+      </ul>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Data Storage</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Stored securely in Google Sheets and Drive, accessible only to tournament organizers. We do not sell or share your data with third parties.</p>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Third-Party Services</div>
+      <ul style="padding-left:18px;font-size:14px;color:var(--t2);line-height:1.9;">
+        <li>Google Sign-In (authentication)</li>
+        <li>Razorpay (payment processing)</li>
+        <li>Google Sheets / Drive (data storage)</li>
+      </ul>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Retention & Deletion</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Data retained 90 days post-tournament. Deletion requests: <a href="mailto:imamericanyess@gmail.com" style="color:var(--g);">imamericanyess@gmail.com</a></p>
+    </div>
+
+    <div class="psec" id="ps-disclaimer" style="display:none;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:var(--g);margin-bottom:4px;">Disclaimer</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px;">Last updated: July 2026</div>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">General</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">VIRGO YT 707 is an independent tournament organizer. We are not affiliated with Krafton, BGMI, or any official esports organization.</p>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Fair Play</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Use of hacks, cheats, emulators or any unauthorized software results in immediate disqualification with no refund. Organizer decision is final.</p>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Prizes</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Prize money paid within 24 hours of confirmed results via UPI. We are not responsible for delays caused by banking systems.</p>
+      <div style="font-size:13px;font-weight:700;color:var(--t1);margin:16px 0 8px;">Liability</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.8;">Not liable for match disruptions due to player internet issues or external technical factors. Total liability is limited to the entry fee paid. Governing law: India.</p>
+    </div>
+
+  </div>
+</div>
+
+<style>
+#pmodal.open{transform:translateY(0);}
+.ptab.on{background:var(--g2)!important;border-color:var(--gb)!important;color:var(--g)!important;}
+</style>
+
+</body>
+</html>
