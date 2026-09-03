@@ -369,7 +369,7 @@ let paymentMode='mooo', moooOrderId='', moooStatus='';
 
 /* ── BOOT ── */
 window.addEventListener('load',async()=>{
-  try{const u=JSON.parse(localStorage.getItem('vyt_u')||'null');if(u&&u.email&&Date.now()-(u.at||0)<7*86400000){user=u;syncAv();}}catch(e){}
+  try{const u=JSON.parse(localStorage.getItem('vyt_u')||'null');if(u&&u.email){user=u;syncAv();}}catch(e){}
   try{const c=JSON.parse(localStorage.getItem('vyt_sess')||'null');if(c&&Date.now()-(c._t||0)<180000)sess=c;}catch(e){}
   try{const a=JSON.parse(localStorage.getItem('vyt_all')||'null');if(a&&Date.now()-(a._t||0)<300000)allSessions=a.data||[];}catch(e){}
   initGoogleSignIn();
