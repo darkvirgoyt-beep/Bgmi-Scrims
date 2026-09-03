@@ -304,6 +304,7 @@ button{cursor:pointer;touch-action:manipulation;}
 const API = "https://script.google.com/macros/s/AKfycbzVyCgmcb21wu4F3LSVbAEYrK6fUpTOWCSLX1MI6llJOaeE01Yrbo8r37YHVSuOCh-2/exec";
 let PW = "";
 let ACTIVE = null;
+const ADMIN_SESSION_KEY = 'vyt_admin_pw';
 function normalizeSession(s){
   if(!s)return s;
   if(s.maxSlots==null&&s.maxTeams!=null)s.maxSlots=s.maxTeams;
@@ -321,11 +322,24 @@ async function unlock() {
   const check = await api({action:'getSessions'}, pw);
   if (!check || check.status !== 'success') { document.getElementById('lerr').style.display='block'; return; }
   PW = pw;
+  sessionStorage.setItem(ADMIN_SESSION_KEY,PW);
+  document.getElementById('lerr').style.display='none';
   document.getElementById('lock').style.display='none';
   document.getElementById('app').style.display='block';
   renderSessions(check.sessions||[]); loadActiveSession();
 }
-function doLogout(){location.reload();}
+function doLogout(){sessionStorage.removeItem(ADMIN_SESSION_KEY);PW='';location.reload();}
+async function restoreAdminSession(){
+  const saved=sessionStorage.getItem(ADMIN_SESSION_KEY);
+  if(!saved)return;
+  const check=await api({action:'getSessions'},saved);
+  if(!check||check.status!=='success'){sessionStorage.removeItem(ADMIN_SESSION_KEY);return;}
+  PW=saved;
+  document.getElementById('lock').style.display='none';
+  document.getElementById('app').style.display='block';
+  renderSessions(check.sessions||[]);loadActiveSession();
+}
+restoreAdminSession();
 
 function toggleSB(){
   document.getElementById('sb').classList.toggle('open');
@@ -518,7 +532,7 @@ function renderEdit() {
     <div class="card"><div class="ftitle">Payment</div>
       <div class="fg" style="margin-bottom:14px">
         <div class="f"><label>Entry Fee (₹)</label><input id="eEF" type="number" value="${s.entryFee||20}"></div>
-        <div class="f"><label>UPI ID</label><input id="eUI" value="${esc(s.upiId||'919153705685@wahdfcbank')}"></div>
+        <div class="f"><label>UPI ID</label><input id="eUI" value="${esc(s.upiId||'virgyt@ptyes')}"></div>
         <div class="f"><label>UPI Name</label><input id="eUN" value="${esc(s.upiName||'Virgo YT (Prince)')}"></div>
       </div>
     </div>
@@ -615,7 +629,7 @@ function openCreate() {
     <div class="fsec"><div class="ftitle">Payment</div>
       <div class="fg" style="margin-bottom:14px">
         <div class="f"><label>Entry Fee (₹)</label><input id="cEF" type="number" value="20"></div>
-        <div class="f"><label>UPI ID</label><input id="cUI" value="919153705685@wahdfcbank"></div>
+        <div class="f"><label>UPI ID</label><input id="cUI" value="virgyt@ptyes"></div>
         <div class="f"><label>UPI Name</label><input id="cUN" value="Virgo YT (Prince)"></div>
       </div>
     </div>
