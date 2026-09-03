@@ -45,11 +45,9 @@ a{color:inherit;text-decoration:none;}
   display:flex;align-items:center;justify-content:space-between;padding:12px 18px;}
 .hdr-brand{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--g);letter-spacing:.06em;}
 .hdr-r{display:flex;align-items:center;gap:10px;}
-	.hdr-link{font-size:18px;line-height:1;opacity:.7;transition:opacity .15s;}
-	.hdr-link:hover{opacity:1;}
-	.admin-link{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--g);border:1px solid var(--gb);background:var(--g3);padding:7px 9px;border-radius:8px;transition:all .15s;}
-	.admin-link:hover{background:var(--g);color:#0d0c00;}
-	.avbtn{width:32px;height:32px;border-radius:50%;border:2px solid var(--gb);background:var(--s2);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hdr-link{font-size:18px;line-height:1;opacity:.7;transition:opacity .15s;}
+.hdr-link:hover{opacity:1;}
+.avbtn{width:32px;height:32px;border-radius:50%;border:2px solid var(--gb);background:var(--s2);overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .avbtn img{width:100%;height:100%;object-fit:cover;}
 
 /* LOGIN */
@@ -61,9 +59,7 @@ a{color:inherit;text-decoration:none;}
 .lcard{background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:28px;}
 .lcard h2{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;margin-bottom:6px;}
 .lcard p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:22px;}
-	.lnote{font-size:11px;color:var(--t3);margin-top:16px;line-height:1.5;}
-	.admin-entry{display:inline-flex;align-items:center;gap:6px;margin-top:16px;color:var(--g);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid transparent;}
-	.admin-entry:hover{border-color:var(--g);}
+.lnote{font-size:11px;color:var(--t3);margin-top:16px;line-height:1.5;}
 
 /* TABS (home screen) */
 .tabs{display:flex;gap:4px;background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:4px;margin-bottom:18px;}
@@ -238,24 +234,22 @@ a{color:inherit;text-decoration:none;}
 
 <div class="scr" id="s-login">
   <div class="lbox">
-	    <div class="llogo">VIRGO<br>YT707</div>
-	    <span class="ltag">BGMI &amp; PUBG Squad Scrims</span>
+    <div class="llogo">VIRGO<br>YT707</div>
+    <span class="ltag">BGMI Squad Scrims</span>
     <div class="lcard">
       <h2>Sign In to Register</h2>
       <p>Use your Google account to register your squad. Your session stays saved.</p>
       <div id="googleBtn"></div>
-	      <div class="lnote">Only used to identify your captain. Never posted publicly.</div>
-	      <a class="admin-entry" href="admin.html">⌁ Tournament administrator access</a>
+      <div class="lnote">Only used to identify your captain. Never posted publicly.</div>
     </div>
   </div>
 </div>
 
 <div class="scr" id="s-home">
-	  <div class="hdr">
-	    <div class="hdr-brand">VIRGO YT 707</div>
-	    <div class="hdr-r">
-	      <a class="admin-link" href="admin.html">Admin</a>
-	      <a class="hdr-link" id="hWa" href="#" target="_blank">💬</a>
+  <div class="hdr">
+    <div class="hdr-brand">VIRGO YT 707</div>
+    <div class="hdr-r">
+      <a class="hdr-link" id="hWa" href="#" target="_blank">💬</a>
       <a class="hdr-link" id="hYt" href="#" target="_blank">▶</a>
       <button class="avbtn" onclick="openProfile()"><img id="hAv" src="" alt=""></button>
     </div>
@@ -294,22 +288,11 @@ a{color:inherit;text-decoration:none;}
     <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step done"></div></div>
     <div class="ph">Pay Entry Fee</div>
     <div class="ps" id="payIntro">Choose a payment method to secure your squad slot.</div>
-    <div id="rzpCard" class="pay-method" style="display:none">
-      <div class="method-label">PRIMARY PAYMENT</div>
-      <div class="method-title">Pay securely with Razorpay</div>
-      <div class="method-sub">UPI, cards and net banking. No screenshot is required.</div>
-      <button class="rzpbtn" id="rzpBtn" type="button" onclick="startRazorpay()">Pay ₹<span id="rzpAmt">0</span> securely →</button>
-    </div>
-    <div id="upiFallbackNote" class="method-note"><b>Direct UPI:</b> scan the official QR or tap the button. It works with Google Pay, PhonePe, Paytm, WhatsApp Pay, FamPay, MobiKwik, Navi, Junio and other compatible UPI apps.</div>
-    <div class="qrblk">
-      <div class="qrw"><img id="qrImg" src="assets/upi-qr.png" alt="Official VIRGO YT UPI QR code"></div>
-      <div class="qi">
-        <div class="upi" id="payUpi"></div>
-        <div class="amt">₹<span id="payAmt"></span></div>
-        <div class="qtrow"><div class="tc">Official QR · Always active</div></div>
-        <a class="lpill" id="upiOpenBtn" href="#" style="margin-top:12px;">Open in UPI app →</a>
-        <div style="font-size:12px;color:var(--t3);margin-top:8px;">Cards, net banking and UPI apps are also available through Razorpay when enabled.</div>
-      </div>
+    <div id="moooCard" class="pay-method">
+      <div class="method-label">SECURE PAYMENT</div>
+      <div class="method-title">Pay entry fee through MOOO</div>
+      <div class="method-sub">You will be redirected to the secure MOOO checkout page. Your registration is created only after the payment is verified.</div>
+      <button class="rzpbtn" id="moooBtn" type="button" onclick="startMoooPayment()">Pay ₹<span id="moooAmt">0</span> securely →</button>
     </div>
     <div class="paydet waiting" id="payDet">
       <div class="dot"></div>
@@ -333,7 +316,7 @@ a{color:inherit;text-decoration:none;}
       </div>
     </div>
     <button class="subbtn" id="subBtn" disabled onclick="submitReg()">Submit Registration</button>
-    <div class="subnote" id="subNote">Pay the entry fee and upload your screenshot to submit.</div>
+    <div class="subnote" id="subNote">Complete the secure MOOO payment to submit.</div>
   </div>
 </div>
 
@@ -372,15 +355,12 @@ a{color:inherit;text-decoration:none;}
 <script>
 const API  = "https://script.google.com/macros/s/AKfycbxBVNUc6C-rng6d3L-JlqelWX65GUWXF0YTrfUYgWN90fV622gg-H31d_GdqO8iN9JuXQ/exec";
 const GCID = "1062428369173-jka84t28t5ltgup9t292e7un4l1ajab3.apps.googleusercontent.com";
-const RAZORPAY_KEY = "";
-const STATIC_UPI_ID = "919153705685@wahdfcbank";
-const STATIC_UPI_NAME = "Virgo YT (Prince)";
-const STATIC_UPI_QR = "assets/upi-qr.png";
+const MOOO_RETURN_PATH = 'index.html';
 
 let user=null, sess=null, allSessions=[], txnRef=null;
 let qrTID=null, qrSec=300, pollID=null;
 let payOK=false, ssB64=null, ssMime=null, ssOK=false;
-let paymentMode='upi', razorpayOrderId='', razorpayPaymentId='', razorpaySignature='';
+let paymentMode='mooo', moooOrderId='', moooStatus='';
 
 /* ── BOOT ── */
 window.addEventListener('load',async()=>{
@@ -424,7 +404,13 @@ async function fetchFresh(){
       allSessions=d2.sessions.map(normalizeSession);localStorage.setItem('vyt_all',JSON.stringify({data:allSessions,_t:Date.now()}));
     }else if(sess&&!allSessions.length){allSessions=[sess];localStorage.setItem('vyt_all',JSON.stringify({data:allSessions,_t:Date.now()}));}
     if(document.getElementById('s-home').classList.contains('on'))renderHome();
+    resumeMoooReturn();
   }catch(e){console.warn('Fresh data unavailable',e);}
+}
+function resumeMoooReturn(){
+  if(!user||!sess||new URLSearchParams(location.search).get('mooo_return')!=='1')return;
+  try{const saved=JSON.parse(sessionStorage.getItem('vyt_mooo_order')||'null');if(saved&&saved.sessionId===sess.id){goScr('payment');}}
+  catch(e){}
 }
 
 /* ── AUTH ── */
@@ -586,59 +572,42 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ── PAYMENT ── */
 function initPay(){
-  payOK=false;ssB64=null;ssOK=false;paymentMode='upi';razorpayOrderId='';razorpayPaymentId='';razorpaySignature='';
+  payOK=false;ssB64=null;ssOK=false;paymentMode='mooo';moooOrderId='';moooStatus='';
   clearInterval(pollID);clearInterval(qrTID);txnRef='SCRIM'+Math.random().toString(36).slice(2,8).toUpperCase();
-  const amount=sess?.entryFee||'20',key=sess?.razorpayKeyId||RAZORPAY_KEY,canUse=!!key&&typeof window.Razorpay==='function';
-  document.getElementById('payUpi').textContent=STATIC_UPI_ID;document.getElementById('payAmt').textContent=amount;document.getElementById('rzpAmt').textContent=amount;
-  document.getElementById('qrImg').src=STATIC_UPI_QR;
-  document.getElementById('upiOpenBtn').href=`upi://pay?pa=${encodeURIComponent(STATIC_UPI_ID)}&pn=${encodeURIComponent(STATIC_UPI_NAME)}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent('BGMI '+txnRef)}`;
-  document.getElementById('rzpCard').style.display=canUse?'block':'none';document.getElementById('upiFallbackNote').style.display='block';document.getElementById('proofBlock').style.display='block';
+  const amount=sess?.entryFee||'20';document.getElementById('moooAmt').textContent=amount;
+  document.getElementById('proofBlock').style.display='block';
   document.getElementById('ocrMsg').style.display='none';document.getElementById('ssPreview').style.display='none';document.getElementById('utrIn').value='';document.getElementById('subBtn').disabled=true;
-  setPaySt(canUse?'rzp':'waiting');pollID=setInterval(pollPay,8000);chkSub();
+  try{const saved=JSON.parse(sessionStorage.getItem('vyt_mooo_order')||'null');if(saved&&saved.sessionId===sess?.id){moooOrderId=saved.orderId;txnRef=saved.txnRef||txnRef;pollID=setInterval(pollMoooPayment,8000);pollMoooPayment();}}catch(e){}
+  setPaySt(moooOrderId?'checking':'waiting');chkSub();
 }
 
-async function startRazorpay(){
-  const key=sess?.razorpayKeyId||RAZORPAY_KEY;
-  if(!key||typeof window.Razorpay!=='function'){alert('Razorpay is not configured yet. Use the UPI fallback below.');return;}
-  const btn=document.getElementById('rzpBtn');btn.disabled=true;btn.textContent='Preparing secure checkout…';
+async function startMoooPayment(){
+  const btn=document.getElementById('moooBtn');btn.disabled=true;btn.textContent='Preparing secure checkout…';
   try{
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'create_razorpay_order',sessionId:sess?.id,txnRef,amount:Number(sess?.entryFee||0)})});
-    const d=await r.json();if(d.status!=='success'||!d.orderId)throw new Error(d.message||'Razorpay order could not be created');
-    razorpayOrderId=d.orderId;paymentMode='razorpay';
-    const rp=new Razorpay({key,order_id:razorpayOrderId,amount:d.amount,currency:d.currency||'INR',name:'VIRGO YT 707',description:(sess?.name||'BGMI Scrim')+' entry',prefill:{name:user?.name||'',email:user?.email||'',contact:document.getElementById('fWa')?.value||''},notes:{sessionId:sess?.id||'',txnRef},handler:function(response){
-      razorpayPaymentId=response.razorpay_payment_id||'';razorpaySignature=response.razorpay_signature||'';payOK=!!razorpayPaymentId;setPaySt(payOK?'ok':'rzp');chkSub();
-    },modal:{ondismiss:function(){if(!payOK){paymentMode='upi';btn.disabled=false;btn.textContent='Pay ₹'+(sess?.entryFee||'20')+' securely →';setPaySt('waiting');chkSub();}}}
-    });
-    rp.on('payment.failed',function(){paymentMode='upi';payOK=false;setPaySt('waiting');chkSub();});rp.open();
-  }catch(e){btn.disabled=false;btn.textContent='Pay ₹'+(sess?.entryFee||'20')+' securely →';alert(e.message||'Could not open Razorpay checkout.');}
+    const redirectUrl=new URL(MOOO_RETURN_PATH,window.location.href).href+'?mooo_return=1';
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'create_mooo_order',sessionId:sess?.id,txnRef,amount:Number(sess?.entryFee||0),customerMobile:document.getElementById('fWa')?.value||'',redirectUrl})});
+    const d=await r.json();if(d.status!=='success'||!d.orderId||!d.paymentUrl)throw new Error(d.message||'MOOO order could not be created');
+    moooOrderId=d.orderId;sessionStorage.setItem('vyt_mooo_order',JSON.stringify({orderId:moooOrderId,txnRef,sessionId:sess?.id}));
+    window.location.href=d.paymentUrl;
+  }catch(e){btn.disabled=false;btn.textContent='Pay ₹'+(sess?.entryFee||'20')+' securely →';alert(e.message||'Could not open MOOO checkout.');}
 }
 
-function genQR(){
-  document.getElementById('qrImg').src=STATIC_UPI_QR;
-}
-function tickQR(){
-  qrSec--;
-  if(qrSec<=0){clearInterval(qrTID);document.getElementById('qrT').textContent='00:00';document.getElementById('qrExp').style.display='flex';document.getElementById('rfBtn').style.display='inline-block';return;}
-  document.getElementById('qrT').textContent=String(Math.floor(qrSec/60)).padStart(2,'0')+':'+String(qrSec%60).padStart(2,'0');
-}
-
-async function pollPay(){
-  if(payOK){clearInterval(pollID);return;}
+async function pollMoooPayment(){
+  if(payOK||!moooOrderId){clearInterval(pollID);return;}
   try{
-    const utr=(document.getElementById('utrIn')?.value||'').trim();
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'check_payment',ref:txnRef,amount:Number(sess?.entryFee||20),utr})});
-    const d=await r.json();
-    if(d.paid){payOK=true;clearInterval(pollID);setPaySt('ok');chkSub();}
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'check_mooo_payment',orderId:moooOrderId})});
+    const d=await r.json();moooStatus=d.status||'';
+    if(d.paid){payOK=true;document.getElementById('utrIn').value=d.utr||'';clearInterval(pollID);setPaySt('ok');chkSub();}
   }catch(e){}
 }
 
 function setPaySt(st){
   const el=document.getElementById('payDet');el.className='paydet '+st;
   const t=document.getElementById('pdT'),s=document.getElementById('pdS');
-  if(st==='waiting'){t.textContent='Waiting for verified payment…';s.textContent='Pay, then enter your UTR. Entry stays locked until the payment is matched.';}
-  else if(st==='rzp'){t.textContent='Choose a verified payment method';s.textContent='Use Razorpay for cards, net banking or supported UPI apps, or use the direct UPI QR below.';}
-  else if(st==='ok'){t.textContent='✅ Payment verified!';s.textContent=paymentMode==='razorpay'?'Razorpay confirmed your payment.':'Your UTR matched a received-payment notification.';}
-  else{t.textContent='Screenshot received — not confirmation';s.textContent='Only a verified Razorpay result or matched received-payment notification unlocks entry.';}
+  if(st==='waiting'){t.textContent='Waiting for MOOO payment…';s.textContent='Start the secure checkout above. Entry stays locked until MOOO confirms the order.';}
+  else if(st==='checking'){t.textContent='Checking MOOO payment…';s.textContent='Your return was received. We are checking the order status securely.';}
+  else if(st==='ok'){t.textContent='✅ Payment verified!';s.textContent='MOOO confirmed your payment.';}
+  else{t.textContent='Payment not confirmed';s.textContent='Only a successful MOOO order-status check unlocks entry.';}
 }
 
 document.getElementById('ssFile').addEventListener('change',function(e){
@@ -673,11 +642,9 @@ async function runOCR(img){
 document.getElementById('utrIn').addEventListener('input',chkSub);
 
 function chkSub(){
-  const utr=(document.getElementById('utrIn').value||'').trim();
-  const razorpayOk=paymentMode==='razorpay'&&payOK&&razorpayPaymentId&&razorpaySignature;
-  const upiOk=paymentMode!=='razorpay'&&payOK&&utr.length>=10;
-  const ok=!!(razorpayOk||upiOk);document.getElementById('subBtn').disabled=!ok;
-  document.getElementById('subNote').textContent=ok?'Payment is verified — submit your registration.':paymentMode==='razorpay'&&!payOK?'Complete a Razorpay payment to continue.':!utr?'Pay with the QR or a UPI app, then enter the UTR / transaction ID.':'Waiting for your received payment to be matched. Screenshots cannot unlock entry.';
+  const ok=paymentMode==='mooo'&&payOK&&!!moooOrderId;
+  document.getElementById('subBtn').disabled=!ok;
+  document.getElementById('subNote').textContent=ok?'Payment is verified — submit your registration.':'Complete the MOOO checkout; screenshots cannot unlock entry.';
 }
 
 /* ── SUBMIT ── */
@@ -694,8 +661,9 @@ async function submitReg(){
     txnRef,utr:document.getElementById('utrIn').value.trim(),
     screenshotBase64:ssB64,screenshotMime:ssMime,
     autoVerified:payOK,
-    paymentMethod:paymentMode==='razorpay'?'Razorpay':(payOK?'UPI-AutoDetected':'Unverified'),
-    razorpayOrderId,razorpayPaymentId,razorpaySignature
+    paymentMethod:paymentMode==='mooo'?'MOOO':'Unverified',
+    moooOrderId,
+    moooTxnStatus:moooStatus
   };
   for(let i=1;i<=4;i++){
     payload['p'+i+'name']=i<=count?(document.getElementById('p'+i+'n')?.value.trim()||''):'';
@@ -711,12 +679,12 @@ async function submitReg(){
     }else if(d.status==='full'){alert('Sorry — session is full!');goScr('home');}
     else if(d.status==='closed'){alert('Registration is closed.');goScr('home');}
     else if(d.status==='duplicate'){alert('Already registered for this session!');localStorage.setItem('vyt_reg_'+sess.id,JSON.stringify({status:'Registered',at:Date.now()}));goScr('room');}
-    else if(d.status==='payment_invalid'){throw new Error('Razorpay payment verification failed. Please contact the organizer before retrying.');}
+    else if(d.status==='payment_invalid'){throw new Error('MOOO payment verification failed. Please wait for confirmation and retry.');}
     else throw new Error(d.message||'Error');
   }catch(e){
     alert('Could not submit — check connection.\n'+e.message);
     btn.disabled=false;btn.textContent='Submit Registration';
-    pollID=setInterval(pollPay,8000);
+    pollID=setInterval(pollMoooPayment,8000);
   }
 }
 
