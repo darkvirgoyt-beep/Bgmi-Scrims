@@ -47,10 +47,24 @@ a{color:inherit;text-decoration:none;}
 .hdr-r{display:flex;align-items:center;gap:10px;}
 .hdr-link{font-size:18px;line-height:1;opacity:.7;transition:opacity .15s;}
 .hdr-link:hover{opacity:1;}
-.refresh-btn{background:none;border:0;color:var(--t2);font-size:18px;line-height:1;padding:0;transition:opacity .15s,transform .2s;}
-.refresh-btn:disabled{opacity:.45;cursor:wait;}
-.refresh-btn.spin{animation:refreshSpin .7s linear infinite;}
+.refresh-btn{position:relative;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.035);border:1px solid var(--b);border-radius:10px;color:var(--t2);line-height:1;cursor:pointer;transition:color .18s ease,background .18s ease,border-color .18s ease,transform .16s ease,box-shadow .18s ease;}
+.refresh-btn::after{content:attr(data-label);position:absolute;top:calc(100% + 9px);right:0;padding:6px 9px;border:1px solid var(--b2);border-radius:7px;background:var(--s2);color:var(--t1);font:600 10px/1.2 'Inter',sans-serif;letter-spacing:.02em;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .16s ease,transform .16s ease;z-index:40;}
+.refresh-btn:hover{color:var(--g);background:rgba(245,200,66,.08);border-color:var(--gb);box-shadow:0 5px 18px rgba(245,200,66,.09);transform:translateY(-1px);}
+.refresh-btn:hover::after,.refresh-btn:focus-visible::after{opacity:1;transform:translateY(0);}
+.refresh-btn:focus-visible{outline:2px solid var(--g);outline-offset:3px;}
+.refresh-btn:active{transform:scale(.96);}
+.refresh-btn:disabled{cursor:wait;}
+.refresh-btn .refresh-icon,.refresh-btn .refresh-check{display:inline-flex;align-items:center;justify-content:center;transition:opacity .18s ease,transform .18s ease;}
+.refresh-btn .refresh-icon{opacity:1;transform:scale(1);}
+.refresh-btn .refresh-check{position:absolute;opacity:0;transform:scale(.55);}
+.refresh-btn.spin{color:var(--g);background:rgba(245,200,66,.1);border-color:var(--gb);box-shadow:0 0 0 4px rgba(245,200,66,.06);}
+.refresh-btn.spin .refresh-icon{animation:refreshSpin .75s cubic-bezier(.23,1,.32,1) infinite;}
+.refresh-btn.success{color:#8ef0b1;border-color:rgba(78,220,133,.42);background:rgba(78,220,133,.1);}
+.refresh-btn.success .refresh-icon{opacity:0;transform:scale(.55);}
+.refresh-btn.success .refresh-check{opacity:1;transform:scale(1);}
+.refresh-btn.error{color:#ff9a9a;border-color:rgba(255,97,97,.42);background:rgba(255,97,97,.09);}
 @keyframes refreshSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.refresh-btn,.refresh-btn::after,.refresh-btn .refresh-icon,.refresh-btn .refresh-check{transition:none}.refresh-btn.spin .refresh-icon{animation:none}.refresh-btn:active{transform:none}}
 .avbtn{width:32px;height:32px;border-radius:50%;border:2px solid var(--gb);background:var(--s2);overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .avbtn img{width:100%;height:100%;object-fit:cover;}
 
@@ -255,7 +269,10 @@ a{color:inherit;text-decoration:none;}
     <div class="hdr-r">
       <a class="hdr-link" id="hWa" href="#" target="_blank">💬</a>
       <a class="hdr-link" id="hYt" href="#" target="_blank">▶</a>
-      <button class="refresh-btn" id="refreshBtn" type="button" onclick="refreshData()" aria-label="Refresh tournaments" title="Refresh tournaments">↻</button>
+      <button class="refresh-btn" id="refreshBtn" type="button" onclick="refreshData()" aria-label="Refresh tournaments" data-label="Refresh tournaments" title="Refresh tournaments">
+        <span class="refresh-icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-14.8-4.6L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 14.8 4.6L21 15"/><path d="M21 20v-5h-5"/></svg></span>
+        <span class="refresh-check" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span>
+      </button>
       <button class="avbtn" onclick="openProfile()"><img id="hAv" src="" alt=""></button>
     </div>
   </div>
@@ -401,6 +418,7 @@ async function syncRegistrationState(){
 async function fetchFresh(){
   try{
     const[r1,r2]=await Promise.all([fetch(API),fetch(API+'?action=history')]);
+    if(!r1.ok||!r2.ok)throw new Error('Refresh request failed');
     const d1=await r1.json(),d2=await r2.json();
     if(d1.status==='active'){
       sess=normalizeSession(d1.session);sess._t=Date.now();localStorage.setItem('vyt_sess',JSON.stringify(sess));syncRegistrationState();
@@ -410,14 +428,19 @@ async function fetchFresh(){
     }else if(sess&&!allSessions.length){allSessions=[sess];localStorage.setItem('vyt_all',JSON.stringify({data:allSessions,_t:Date.now()}));}
     if(document.getElementById('s-home').classList.contains('on'))renderHome();
     resumeMoooReturn();
-  }catch(e){console.warn('Fresh data unavailable',e);}
+    return true;
+  }catch(e){console.warn('Fresh data unavailable',e);return false;}
 }
 async function refreshData(){
   const btn=document.getElementById('refreshBtn');
   if(btn?.disabled)return;
-  if(btn){btn.disabled=true;btn.classList.add('spin');btn.setAttribute('aria-label','Refreshing tournaments');}
-  try{await fetchFresh();}
-  finally{if(btn){btn.disabled=false;btn.classList.remove('spin');btn.setAttribute('aria-label','Refresh tournaments');}}
+  if(btn){btn.disabled=true;btn.classList.remove('success','error');btn.classList.add('spin');btn.setAttribute('aria-busy','true');btn.setAttribute('aria-label','Refreshing tournaments');btn.dataset.label='Refreshing…';}
+  const ok=await fetchFresh();
+  if(btn){
+    btn.disabled=false;btn.classList.remove('spin');btn.classList.add(ok?'success':'error');btn.removeAttribute('aria-busy');
+    btn.setAttribute('aria-label',ok?'Tournaments updated':'Refresh failed');btn.dataset.label=ok?'Updated':'Refresh failed';
+    setTimeout(()=>{btn.classList.remove('success','error');btn.setAttribute('aria-label','Refresh tournaments');btn.dataset.label='Refresh tournaments';btn.title='Refresh tournaments';},1100);
+  }
 }
 function resumeMoooReturn(){
   if(!user||!sess||new URLSearchParams(location.search).get('mooo_return')!=='1')return;
