@@ -953,22 +953,23 @@ function showPolicy(id){
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-    camera.position.set(0, 0, 40);
+    camera.position.set(0, 0, 35);
 
-    const particleCount = 120;
+    // More visible gold particles
+    const particleCount = 200;
     const positions = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
     const alphas = new Float32Array(particleCount);
 
     for(let i=0;i<particleCount;i++){
-      const r = 15 + Math.random()*25;
+      const r = 12 + Math.random()*22;
       const theta = Math.random()*Math.PI*2;
       const phi = Math.acos(2*Math.random()-1);
       positions[i*3] = r*Math.sin(phi)*Math.cos(theta);
       positions[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
       positions[i*3+2] = r*Math.cos(phi);
-      sizes[i] = 0.3 + Math.random()*0.7;
-      alphas[i] = 0.05 + Math.random()*0.15;
+      sizes[i] = 0.8 + Math.random()*1.5;
+      alphas[i] = 0.15 + Math.random()*0.35;
     }
 
     const geom = new THREE.BufferGeometry();
@@ -977,58 +978,71 @@ function showPolicy(id){
     geom.setAttribute('alpha', new THREE.BufferAttribute(alphas,1));
 
     const mat = new THREE.PointsMaterial({
-      color:0xf5c842, size:1.2, transparent:true, opacity:1,
-      depthWrite:false, blending:THREE.AdditiveBlending
+      color:0xf5c842, size:2.5, transparent:true, opacity:1,
+      depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true
     });
     particles = new THREE.Points(geom, mat);
     scene.add(particles);
 
-    const crateGeom = new THREE.BoxGeometry(1.2, 1, 1.2);
+    // Supply crates - more visible
+    const crateGeom = new THREE.BoxGeometry(1.8, 1.4, 1.8);
     const crateMat = new THREE.MeshBasicMaterial({
-      color:0x8b5e3c, transparent:true, opacity:0.12, wireframe:true
+      color:0x8b5e3c, transparent:true, opacity:0.25, wireframe:true, linewidth:2
     });
     crates = [];
-    for(let i=0;i<6;i++){
+    for(let i=0;i<8;i++){
       const crate = new THREE.Mesh(crateGeom, crateMat);
-      const angle = (i/6)*Math.PI*2;
+      const angle = (i/8)*Math.PI*2 + Math.random()*0.3;
       crate.position.set(
-        Math.cos(angle)*18,
-        -5 + Math.random()*4,
-        Math.sin(angle)*18
+        Math.cos(angle)*22,
+        -8 + Math.random()*6,
+        Math.sin(angle)*22
       );
-      crate.rotation.y = Math.random()*Math.PI;
-      crate.userData = {angle, speed:0.0006+Math.random()*0.001, offset:Math.random()*Math.PI*2};
+      crate.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+      crate.userData = {angle, speed:0.0005+Math.random()*0.0008, offset:Math.random()*Math.PI*2};
       scene.add(crate);
       crates.push(crate);
     }
 
-    const chuteGeom = new THREE.ConeGeometry(2, 3, 6, 1, true);
+    // Airdrop parachute - more visible
+    const chuteGeom = new THREE.ConeGeometry(3, 5, 8, 1, true);
     const chuteMat = new THREE.MeshBasicMaterial({
-      color:0xf5c842, transparent:true, opacity:0.06, wireframe:true, side:THREE.DoubleSide
+      color:0xf5c842, transparent:true, opacity:0.15, wireframe:true, side:THREE.DoubleSide, linewidth:2
     });
     parachute = new THREE.Mesh(chuteGeom, chuteMat);
-    parachute.position.set(-12, 15, -10);
+    parachute.position.set(-18, 20, -15);
     scene.add(parachute);
 
+    // Add a subtle ground plane grid
+    const gridHelper = new THREE.GridHelper(60, 30, 0x333344, 0x1a1a2a);
+    gridHelper.position.y = -15;
+    gridHelper.material.opacity = 0.15;
+    gridHelper.material.transparent = true;
+    scene.add(gridHelper);
+
     animate(0);
+    console.log('3D BGMI animation initialized');
   }
 
   function animate(time){
     const t = time * 0.001;
-    if(particles){ particles.rotation.y += 0.00003; particles.rotation.x += 0.000015; }
+    if(particles){
+      particles.rotation.y += 0.00002;
+      particles.rotation.x += 0.00001;
+    }
     if(crates){
       crates.forEach(c=>{
         c.userData.angle += c.userData.speed;
-        c.position.x = Math.cos(c.userData.angle)*18;
-        c.position.z = Math.sin(c.userData.angle)*18;
-        c.rotation.y += 0.001;
-        c.position.y = -5 + Math.sin(t + c.userData.offset)*0.8;
+        c.position.x = Math.cos(c.userData.angle)*22;
+        c.position.z = Math.sin(c.userData.angle)*22;
+        c.rotation.y += 0.0008;
+        c.position.y = -8 + Math.sin(t + c.userData.offset)*1.2;
       });
     }
     if(parachute){
-      parachute.position.x = -12 + Math.sin(t*0.3)*1.5;
-      parachute.position.y = 15 + Math.cos(t*0.2)*0.5;
-      parachute.rotation.y += 0.002;
+      parachute.position.x = -18 + Math.sin(t*0.25)*2.5;
+      parachute.position.y = 20 + Math.cos(t*0.18)*0.8;
+      parachute.rotation.y += 0.0015;
     }
     if(renderer && scene && camera) renderer.render(scene, camera);
     requestAnimationFrame(animate);
@@ -1038,11 +1052,27 @@ function showPolicy(id){
     try{
       const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
       const gain = audioCtx.createGain();
-      gain.gain.value = 0.01;
+      gain.gain.value = 0.015;
       gain.connect(audioCtx.destination);
       const osc = audioCtx.createOscillator();
       osc.type = 'sine'; osc.frequency.value = 55;
       osc.connect(gain); osc.start();
+      
+      // Occasional soft wind
+      setInterval(()=>{
+        if(!audioCtx) return;
+        const bufferSize = audioCtx.sampleRate * 1.5;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1)*0.008;
+        const src = audioCtx.createBufferSource();
+        src.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 300;
+        src.connect(filter).connect(gain);
+        src.start();
+        src.stop(audioCtx.currentTime + 1.5);
+      }, 12000 + Math.random()*18000);
     }catch(e){}
   }
 
