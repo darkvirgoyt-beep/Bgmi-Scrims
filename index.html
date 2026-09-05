@@ -30,13 +30,13 @@ button{cursor:pointer;touch-action:manipulation;}
 a{color:inherit;text-decoration:none;}
 
 /* SCREENS */
-.scr{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;}
+.scr{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column;background:rgba(9,9,18,.92);}
 .scr.on{display:flex;}
 .sc{flex:1;max-width:540px;margin:0 auto;padding:20px 18px 80px;width:100%;}
 
 /* LOADING */
 #s-load{align-items:center;justify-content:center;
-  background:radial-gradient(ellipse 600px 400px at 50% 30%,rgba(245,200,66,.06),transparent 60%),var(--bg);}
+  background:radial-gradient(ellipse 600px 400px at 50% 30%,rgba(245,200,66,.06),transparent 60%),rgba(9,9,18,.7);}
 .load-logo{font-family:'Rajdhani',sans-serif;font-size:42px;font-weight:700;color:var(--g);letter-spacing:.08em;animation:breathe 1.6s ease-in-out infinite;}
 .load-sub{font-size:12px;color:var(--t3);letter-spacing:.2em;text-transform:uppercase;margin-top:8px;}
 @keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.97)}}
@@ -71,7 +71,7 @@ a{color:inherit;text-decoration:none;}
 
 /* LOGIN */
 #s-login{align-items:center;justify-content:center;
-  background:radial-gradient(ellipse 700px 500px at 50% 0%,rgba(245,200,66,.07),transparent 55%),var(--bg);}
+  background:radial-gradient(ellipse 700px 500px at 50% 0%,rgba(245,200,66,.07),transparent 55%),rgba(9,9,18,.85);}
 .lbox{width:100%;max-width:360px;padding:24px;text-align:center;}
 .llogo{font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--g);letter-spacing:.06em;line-height:1;margin-bottom:4px;}
 .ltag{font-size:10px;color:var(--t3);letter-spacing:.25em;text-transform:uppercase;margin-bottom:28px;display:block;}
@@ -932,31 +932,33 @@ function showPolicy(id){
   </div>
 </div>
 
-<script>
 // 3D BGMI/PUBG Background Animation
 (function(){
   window._bgAnimationStarted = true;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(!window.THREE) return;
 
-  let canvas, renderer, scene, camera, particles, crates, parachute;
+  let canvas, renderer, scene, camera, particles, crates, parachute, gridHelper;
+  let isMobile = window.innerWidth < 768;
+  let lastFrame = 0;
 
   function init(){
     canvas = document.getElementById('bg-canvas');
     if(!canvas) return;
     try{
-      renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+      renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:!isMobile});
     }catch(e){console.warn('WebGL init failed:',e);return;}
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.setClearColor(0x000000, 0);
+    renderer.powerPreference = "high-performance";
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-    camera.position.set(0, 0, 35);
+    camera.position.set(0, 0, isMobile ? 30 : 35);
 
-    // More visible gold particles
-    const particleCount = 200;
+    // Particle count based on device
+    const particleCount = isMobile ? 80 : 200;
     const positions = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
     const alphas = new Float32Array(particleCount);
@@ -978,21 +980,22 @@ function showPolicy(id){
     geom.setAttribute('alpha', new THREE.BufferAttribute(alphas,1));
 
     const mat = new THREE.PointsMaterial({
-      color:0xf5c842, size:2.5, transparent:true, opacity:1,
+      color:0xf5c842, size: isMobile ? 2 : 2.5, transparent:true, opacity:1,
       depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true
     });
     particles = new THREE.Points(geom, mat);
     scene.add(particles);
 
-    // Supply crates - more visible
+    // Supply crates - fewer on mobile
+    const crateCount = isMobile ? 4 : 8;
     const crateGeom = new THREE.BoxGeometry(1.8, 1.4, 1.8);
     const crateMat = new THREE.MeshBasicMaterial({
-      color:0x8b5e3c, transparent:true, opacity:0.25, wireframe:true, linewidth:2
+      color:0x8b5e3c, transparent:true, opacity:0.25, wireframe:true
     });
     crates = [];
-    for(let i=0;i<8;i++){
+    for(let i=0;i<crateCount;i++){
       const crate = new THREE.Mesh(crateGeom, crateMat);
-      const angle = (i/8)*Math.PI*2 + Math.random()*0.3;
+      const angle = (i/crateCount)*Math.PI*2 + Math.random()*0.3;
       crate.position.set(
         Math.cos(angle)*22,
         -8 + Math.random()*6,
@@ -1004,31 +1007,40 @@ function showPolicy(id){
       crates.push(crate);
     }
 
-    // Airdrop parachute - more visible
+    // Airdrop parachute
     const chuteGeom = new THREE.ConeGeometry(3, 5, 8, 1, true);
     const chuteMat = new THREE.MeshBasicMaterial({
-      color:0xf5c842, transparent:true, opacity:0.15, wireframe:true, side:THREE.DoubleSide, linewidth:2
+      color:0xf5c842, transparent:true, opacity:0.15, wireframe:true, side:THREE.DoubleSide
     });
     parachute = new THREE.Mesh(chuteGeom, chuteMat);
     parachute.position.set(-18, 20, -15);
     scene.add(parachute);
 
-    // Add a subtle ground plane grid
-    const gridHelper = new THREE.GridHelper(60, 30, 0x333344, 0x1a1a2a);
-    gridHelper.position.y = -15;
-    gridHelper.material.opacity = 0.15;
-    gridHelper.material.transparent = true;
-    scene.add(gridHelper);
+    // Ground grid - skip on mobile for performance
+    if(!isMobile){
+      gridHelper = new THREE.GridHelper(60, 30, 0x333344, 0x1a1a2a);
+      gridHelper.position.y = -15;
+      gridHelper.material.opacity = 0.15;
+      gridHelper.material.transparent = true;
+      scene.add(gridHelper);
+    }
 
     animate(0);
-    console.log('3D BGMI animation initialized');
+    console.log('3D BGMI animation initialized, mobile:', isMobile);
   }
 
   function animate(time){
+    // Frame throttling on mobile
+    if(isMobile && time - lastFrame < 33) { // ~30fps max
+      requestAnimationFrame(animate);
+      return;
+    }
+    lastFrame = time;
+
     const t = time * 0.001;
     if(particles){
-      particles.rotation.y += 0.00002;
-      particles.rotation.x += 0.00001;
+      particles.rotation.y += isMobile ? 0.000015 : 0.00002;
+      particles.rotation.x += isMobile ? 0.000007 : 0.00001;
     }
     if(crates){
       crates.forEach(c=>{
@@ -1058,7 +1070,6 @@ function showPolicy(id){
       osc.type = 'sine'; osc.frequency.value = 55;
       osc.connect(gain); osc.start();
       
-      // Occasional soft wind
       setInterval(()=>{
         if(!audioCtx) return;
         const bufferSize = audioCtx.sampleRate * 1.5;
@@ -1097,7 +1108,7 @@ function showPolicy(id){
   }
 
   window.addEventListener('resize',()=>{
-    if(renderer){ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+    if(renderer){ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); isMobile = window.innerWidth < 768; }
   });
 })();
 </script>
